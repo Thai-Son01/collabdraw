@@ -1,12 +1,13 @@
 import styles from "./Tool.module.css"
 
-export default function Tool(props : any) {
-    //i want a state for the size and colour?
-
-
+export default function Tool({sourceName, name, onSelect} : 
+                            {sourceName : string, name : string, onSelect : (id : string) => void}) {
     
     return (<img className = {`${styles.toolIcon}`}
-        src = {props.sourceName}
+        src = {sourceName}
         alt="does not work"
+        onClick={() => {
+            console.log(`clicked on ${name}`)
+            onSelect(name);}}
         ></img>)
 }
