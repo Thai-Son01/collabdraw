@@ -20,6 +20,38 @@ export default function DrawingCanvas({pWidth, selectedTool} :
             return [x, y];
     }
 
+
+    function draw(e : React.MouseEvent, ctx : CanvasRenderingContext2D) {
+        let [currentX, currentY] = getMousePosition(canvasRef.current as HTMLCanvasElement, e);
+        ctx.lineTo(currentX, currentY);
+        ctx.moveTo(currentX, currentY)
+        ctx.stroke();
+    }
+
+    function setupTool(e : React.MouseEvent,
+                       ctx : CanvasRenderingContext2D, 
+                       tool : string,
+                       toolWidth : number) {
+
+        switch(tool) {
+            case "pen" : {
+                ctx.globalCompositeOperation = "source-over";
+                break;
+            }
+            case "eraser" : {
+                ctx.globalCompositeOperation = "destination-out";
+                break;
+            }
+            default : break;
+        }
+        ctx.lineWidth = toolWidth;
+        ctx.lineCap = "round";
+        let [startX, startY] = getMousePosition(canvasRef.current as HTMLCanvasElement, e);
+        ctx.moveTo(startX, startY);
+        ctx.beginPath();
+
+    }
+
     useEffect(() => {
         if(canvasRef.current){
             canvasRef.current.focus(); //necessary?
@@ -36,49 +68,28 @@ export default function DrawingCanvas({pWidth, selectedTool} :
             }
         }, [])
 
-
-        //also getting big need to put in functions
         //casting everytime...
-        //need to fix cursor not totally accurate when clicking. on peut voir que le stroke commence un peu plus loin
-        
+        //need to fix cursor not totally accurate when clicking. on peut voir que le stroke commence un peu plus loin        
         return (<canvas
             className ={`${styles.drawingCanvas}`}
             onMouseDown={(e : React.MouseEvent)=> {
                 if (!isDrawing) {
                     isDrawing = true;
-                    let [startX, startY] = getMousePosition(canvasRef.current as HTMLCanvasElement, e);
-                    console.log(ctxRef.current);
                     if (ctxRef.current) {
-                        //check if is pen or eraser, would need to do switch case i guess to the tool
-                        if(selectedTool === "pen"){
-                            ctxRef.current.globalCompositeOperation = "source-over";
-                            ctxRef.current.lineWidth = pWidth;
-                            ctxRef.current.moveTo(startX, startY);
-                            ctxRef.current.beginPath();
-                        }
-                        if(selectedTool === "eraser") {
-                            ctxRef.current.globalCompositeOperation="destination-out";
-                            ctxRef.current.moveTo(startX, startY);
-                            ctxRef.current.beginPath();
-                        }
+                        setupTool(e, ctxRef.current, selectedTool, pWidth); //called everytime scuffed?
+                        //width is set only when drawing dont know if that is what we want!
                     }
                 }
 
             }}
             onMouseMove={(e : React.MouseEvent) => {
                 if (ctxRef.current && isDrawing) {
-                    let [currentX, currentY] = getMousePosition(canvasRef.current as HTMLCanvasElement, e);
-                    ctxRef.current.lineTo(currentX, currentY);
-                    ctxRef.current.moveTo(currentX, currentY)
-                    ctxRef.current.stroke();
-
+                    draw(e, ctxRef.current);
                 }
-
             }}
             onMouseUp={() => {
                 isDrawing = false;
             }}
             ref = {canvasRef}
-
             ></canvas>)
 }
