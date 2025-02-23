@@ -69,7 +69,9 @@ export default function DrawingCanvas({pWidth, selectedTool} :
         }, [])
 
         //casting everytime...
-        //need to fix cursor not totally accurate when clicking. on peut voir que le stroke commence un peu plus loin        
+        //need to fix cursor not totally accurate when clicking. on peut voir que le stroke commence un peu plus loin
+        //mouseup outside of canvas. canvas still thinks it's drawing because event is not captured. to fix
+
         return (<canvas
             className ={`${styles.drawingCanvas}`}
             onMouseDown={(e : React.MouseEvent)=> {
@@ -80,7 +82,6 @@ export default function DrawingCanvas({pWidth, selectedTool} :
                         //width is set only when drawing dont know if that is what we want!
                     }
                 }
-
             }}
             onMouseMove={(e : React.MouseEvent) => {
                 if (ctxRef.current && isDrawing) {
@@ -89,6 +90,23 @@ export default function DrawingCanvas({pWidth, selectedTool} :
             }}
             onMouseUp={() => {
                 isDrawing = false;
+            }}
+
+            onMouseOutCapture={() => {
+                if (ctxRef.current && isDrawing) {
+                    ctxRef.current.closePath();
+                }
+            }}
+
+            onMouseOverCapture={(e : React.MouseEvent) => {
+                if (ctxRef.current && isDrawing) {
+                    if (e.buttons != 0) {
+                        ctxRef.current.beginPath();
+                    }
+                    else {
+                        isDrawing=false;
+                    }
+                }
             }}
             ref = {canvasRef}
             ></canvas>)
