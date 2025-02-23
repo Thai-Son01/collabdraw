@@ -20,7 +20,9 @@ function App() {
       testing = {changeValue}
       defaultPenWidth = {penWidth}
       ></ToolBar>
-      <DrawingCanvas></DrawingCanvas>
+      <DrawingCanvas
+      pWidth = {penWidth}
+      ></DrawingCanvas>
       <Chat></Chat>
     </>
   )

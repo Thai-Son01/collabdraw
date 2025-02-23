@@ -3,10 +3,8 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 
 
 //drawing canvas is not reloaded when app is rerendered so context is lost xdd
-export default function DrawingCanvas(){
+export default function DrawingCanvas({pWidth} : {pWidth : number}){
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    // let ctxRef = useRef<CanvasRenderingContext2D>(null);
-    // let ctx : CanvasRenderingContext2D | null = null;
     const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
     let isDrawing : boolean = false;
     let startX : number = 0;
@@ -22,16 +20,18 @@ export default function DrawingCanvas(){
             
             return [x, y];
     }
-    
+
     useEffect(() => {
         if(canvasRef.current){
-            console.log("getting the canvas context");
-            canvasRef.current.focus();
+            canvasRef.current.focus(); //necessary?
             //has to be done somewhere else
             canvasRef.current.width = window.innerWidth;
             canvasRef.current.height = window.innerHeight;
             const ctx = canvasRef.current.getContext("2d");
             if (ctx) {
+                ctx.fillStyle = "rgb(200 0 0)";
+                ctx.lineWidth = pWidth;
+                ctx.lineCap = "round";                  
                 ctxRef.current = ctx;
             }
             }
@@ -51,9 +51,7 @@ export default function DrawingCanvas(){
                     [startX, startY] = getMousePosition(canvasRef.current as HTMLCanvasElement, e);
                     console.log(ctxRef.current);
                     if (ctxRef.current) {
-                        ctxRef.current.fillStyle = "rgb(200 0 0)";
-                        ctxRef.current.lineWidth = 3;
-                        ctxRef.current.lineCap = "round";
+                        ctxRef.current.lineWidth = pWidth;
                         ctxRef.current.moveTo(startX, startY);
                         ctxRef.current.beginPath();
                     }
@@ -62,7 +60,6 @@ export default function DrawingCanvas(){
             }}
             onMouseMove={(e : React.MouseEvent) => {
                 if (ctxRef.current && isDrawing) {
-                    console.log("isdrawing is true");
                     let [currentX, currentY] = getMousePosition(canvasRef.current as HTMLCanvasElement, e);
                     ctxRef.current.lineTo(currentX, currentY);
                     ctxRef.current.moveTo(currentX, currentY)
@@ -78,7 +75,3 @@ export default function DrawingCanvas(){
 
             ></canvas>)
 }
-
-//on mouse click -> start path?
-//on mouse down -> get point path
-//on mouse up or some -> 
