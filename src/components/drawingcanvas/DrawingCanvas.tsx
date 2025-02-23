@@ -1,8 +1,6 @@
 import styles from './DrawingCanvas.module.css'
 import React, { useState, useEffect, useRef, useCallback } from "react";
 
-
-//drawing canvas is not reloaded when app is rerendered so context is lost xdd
 export default function DrawingCanvas({pWidth, selectedTool} : 
                                     {pWidth : number,
                                     selectedTool : string
@@ -10,10 +8,8 @@ export default function DrawingCanvas({pWidth, selectedTool} :
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
     let isDrawing : boolean = false;
-    // let startX : number = 0;
-    // let startY : number = 0;
 
-    //will need to create functions in here
+    //will need to create functions in here is getting kinda big
     function getMousePosition(canvas : HTMLCanvasElement, event : React.MouseEvent ) : [number, number] {
             let rect = canvas.getBoundingClientRect();
             let scaleX = canvas.width / rect.width;
