@@ -55,7 +55,7 @@ export default function DrawingCanvas({pWidth, selectedTool} :
     useEffect(() => {
         if(canvasRef.current){
             canvasRef.current.focus(); //necessary?
-            //has to be done somewhere else
+            //has to be done somewhere else for initial setup?
             canvasRef.current.width = window.innerWidth;
             canvasRef.current.height = window.innerHeight;
             const ctx = canvasRef.current.getContext("2d");
@@ -68,9 +68,7 @@ export default function DrawingCanvas({pWidth, selectedTool} :
             }
         }, [])
 
-        //casting everytime...
         //need to fix cursor not totally accurate when clicking. on peut voir que le stroke commence un peu plus loin
-        //mouseup outside of canvas. canvas still thinks it's drawing because event is not captured. to fix
 
         return (<canvas
             className ={`${styles.drawingCanvas}`}

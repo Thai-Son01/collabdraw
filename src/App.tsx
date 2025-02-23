@@ -25,10 +25,12 @@ function App() {
       itemSelected= {itemSelected}
       changeSelectedTool={toolOnClick}
       ></ToolBar>
+
       <DrawingCanvas
       pWidth = {penWidth}
       selectedTool= {itemSelected}
       ></DrawingCanvas>
+      
       <Chat></Chat>
     </>
   )
