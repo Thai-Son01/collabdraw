@@ -1,6 +1,8 @@
 import styles from './DrawingCanvas.module.css'
 import React, { useState, useEffect, useRef, useCallback } from "react";
 
+
+//drawing canvas is not reloaded when app is rerendered so context is lost xdd
 export default function DrawingCanvas(){
     const canvasRef = useRef<HTMLCanvasElement>(null);
     let ctx : CanvasRenderingContext2D | null = null;
