@@ -34,6 +34,7 @@ export default function ToolBar({changePenWidth, defaultPenWidth, changeSelected
         <ToolSettings
         defaultValue = {defaultPenWidth}
         changeValue = {changePenWidth}
+        currentTool= {itemSelected}
         ></ToolSettings>
     </div>
     )

@@ -91,7 +91,6 @@ export default function DrawingCanvas({pWidth, selectedTool} :
             onMouseUp={() => {
                 isDrawing = false;
             }}
-
             onMouseOutCapture={() => {
                 if (ctxRef.current && isDrawing) {
                     ctxRef.current.closePath();
