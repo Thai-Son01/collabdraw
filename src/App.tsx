@@ -5,23 +5,29 @@ import Chat from './components/chat/Chat'
 import ToolBar from './components/toolbar/ToolBar'
 
 function App() {
-  const [penWidth, setPenWidth] = useState(100);
+  //this thing should be an object?
+  const [penWidth, setPenWidth] = useState(10);
+  const [itemSelected, setItemSelected] = useState("pen");
+  const [opacityLevel, setOpacityLevel] = useState(100);
 
   function changeValue(value : number) {
     setPenWidth(value);
   }
+  function toolOnClick(id : string) {
+    setItemSelected(id);
+}
 
-
-
-  //pen width would be in drawingcanvas as props
   return (
     <>
       <ToolBar
-      testing = {changeValue}
+      changePenWidth = {changeValue}
       defaultPenWidth = {penWidth}
+      itemSelected= {itemSelected}
+      changeSelectedTool={toolOnClick}
       ></ToolBar>
       <DrawingCanvas
       pWidth = {penWidth}
+      selectedTool= {itemSelected}
       ></DrawingCanvas>
       <Chat></Chat>
     </>

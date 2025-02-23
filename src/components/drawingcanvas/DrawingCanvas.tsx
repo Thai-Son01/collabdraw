@@ -3,12 +3,15 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 
 
 //drawing canvas is not reloaded when app is rerendered so context is lost xdd
-export default function DrawingCanvas({pWidth} : {pWidth : number}){
+export default function DrawingCanvas({pWidth, selectedTool} : 
+                                    {pWidth : number,
+                                    selectedTool : string
+                                    }){
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
     let isDrawing : boolean = false;
-    let startX : number = 0;
-    let startY : number = 0;
+    // let startX : number = 0;
+    // let startY : number = 0;
 
     //will need to create functions in here
     function getMousePosition(canvas : HTMLCanvasElement, event : React.MouseEvent ) : [number, number] {
@@ -40,7 +43,6 @@ export default function DrawingCanvas({pWidth} : {pWidth : number}){
 
         //also getting big need to put in functions
         //casting everytime...
-        //need to fix something about the context too dying when hot reloading
         //need to fix cursor not totally accurate when clicking. on peut voir que le stroke commence un peu plus loin
         
         return (<canvas
@@ -48,12 +50,21 @@ export default function DrawingCanvas({pWidth} : {pWidth : number}){
             onMouseDown={(e : React.MouseEvent)=> {
                 if (!isDrawing) {
                     isDrawing = true;
-                    [startX, startY] = getMousePosition(canvasRef.current as HTMLCanvasElement, e);
+                    let [startX, startY] = getMousePosition(canvasRef.current as HTMLCanvasElement, e);
                     console.log(ctxRef.current);
                     if (ctxRef.current) {
-                        ctxRef.current.lineWidth = pWidth;
-                        ctxRef.current.moveTo(startX, startY);
-                        ctxRef.current.beginPath();
+                        //check if is pen or eraser, would need to do switch case i guess to the tool
+                        if(selectedTool === "pen"){
+                            ctxRef.current.globalCompositeOperation = "source-over";
+                            ctxRef.current.lineWidth = pWidth;
+                            ctxRef.current.moveTo(startX, startY);
+                            ctxRef.current.beginPath();
+                        }
+                        if(selectedTool === "eraser") {
+                            ctxRef.current.globalCompositeOperation="destination-out";
+                            ctxRef.current.moveTo(startX, startY);
+                            ctxRef.current.beginPath();
+                        }
                     }
                 }
 

@@ -4,18 +4,16 @@ import styles from './ToolBar.module.css'
 import { useState } from 'react';
 
 
-export default function ToolBar({testing, defaultPenWidth} : {testing : (value : number) => void, defaultPenWidth : number}) {
-    const [itemSelected, setItemSelected] = useState("");
-    // const [penWidth, setPenWidth] = useState(100);
+export default function ToolBar({changePenWidth, defaultPenWidth, changeSelectedTool, itemSelected} : 
+                                {changePenWidth : (value : number) => void,
+                                defaultPenWidth : number, 
+                                changeSelectedTool : (tool : string) => void,
+                                itemSelected : string
+                            }) {
+
 
     const pen = "./pen.svg";
     const eraser = "./eraser.svg";
-
-    function toolOnClick(id : string) {
-        setItemSelected(id);
-    }
-
-
     return (
     <div 
     className={`${styles.toolBar}`}>
@@ -23,19 +21,19 @@ export default function ToolBar({testing, defaultPenWidth} : {testing : (value :
         sourceName = {pen}
         name = "pen"
         selected = {itemSelected}
-        onSelect = {toolOnClick}
+        onSelect = {changeSelectedTool}
         ></Tool>
 
         <Tool 
         sourceName = {eraser}
         name = "eraser"
         selected = {itemSelected}
-        onSelect = {toolOnClick}
+        onSelect = {changeSelectedTool}
         ></Tool>
 
         <ToolSettings
         defaultValue = {defaultPenWidth}
-        changeValue = {testing}
+        changeValue = {changePenWidth}
         ></ToolSettings>
     </div>
     )
