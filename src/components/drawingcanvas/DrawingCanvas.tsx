@@ -1,14 +1,28 @@
+import { Client } from '@stomp/stompjs';
 import styles from './DrawingCanvas.module.css'
 import React, { useState, useEffect, useRef, useCallback } from "react";
 
-export default function DrawingCanvas({pWidth, selectedTool} : 
+export default function DrawingCanvas({pWidth, selectedTool, connection} : 
                                     {pWidth : number,
-                                    selectedTool : string
+                                    selectedTool : string,
+                                    connection : Client | null
                                     }){
+
+    
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
     let isDrawing : boolean = false;
-
+    
+    //this will send coordinates only
+    function sendData() {
+        if (connection) {
+            connection.publish({destination : "/app/coordinates/1",
+                body: JSON.stringify({"x" : 1,
+                                      "y" : 1,
+                                        })
+                });
+        }
+    }
     //will need to create functions in here is getting kinda big
     function getMousePosition(canvas : HTMLCanvasElement, event : React.MouseEvent ) : [number, number] {
             let rect = canvas.getBoundingClientRect();
@@ -20,12 +34,13 @@ export default function DrawingCanvas({pWidth, selectedTool} :
             return [x, y];
     }
 
-
+    //maybe this should take x y coord instead of event
     function draw(e : React.MouseEvent, ctx : CanvasRenderingContext2D) {
         let [currentX, currentY] = getMousePosition(canvasRef.current as HTMLCanvasElement, e);
         ctx.lineTo(currentX, currentY);
         ctx.moveTo(currentX, currentY)
         ctx.stroke();
+        sendData();
     }
 
     function setupTool(e : React.MouseEvent,
@@ -47,8 +62,11 @@ export default function DrawingCanvas({pWidth, selectedTool} :
         ctx.lineWidth = toolWidth;
         ctx.lineCap = "round";
         let [startX, startY] = getMousePosition(canvasRef.current as HTMLCanvasElement, e);
-        ctx.moveTo(startX, startY);
         ctx.beginPath();
+        ctx.lineTo(startX, startY);
+        ctx.moveTo(startX, startY);
+        ctx.stroke();
+        sendData();
 
     }
 
