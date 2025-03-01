@@ -22,7 +22,8 @@ function App() {
   const [opacityLevel, setOpacityLevel] = useState(100);
 
   const connection = useWebsocketConnection(userIdentifier.current,
-                                           roomIdentifier.current, WS_URL);
+                                           roomIdentifier.current, WS_URL) as Client; //random cast sinon ca chiale
+
   // useEffect(() => {
   //   const client = new Client({
 

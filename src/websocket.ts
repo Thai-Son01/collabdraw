@@ -1,8 +1,10 @@
 import { Client } from "@stomp/stompjs";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function useWebsocketConnection(userId : string, room : string, serverUrl : string) {
-    const connection = useRef<Client>(null);
+    // const connection = useRef<Client>(null);
+    const [websocketConnection, setWebsocketConnection] = useState<Client | null>(null); //xd state?
+    
 
     useEffect(() => {
 
@@ -42,12 +44,15 @@ export default function useWebsocketConnection(userId : string, room : string, s
 
             })
         client.activate()
-        connection.current = client;
+        // connection.current = client;
+        setWebsocketConnection(client);
 
         return () => {
-            client.deactivate()
+            websocketConnection?.deactivate()
         }
     }, [])
 
-    return connection.current;
+    // console.log(connection.current?.connected);
+    // return connection.current;
+    return websocketConnection;
 }

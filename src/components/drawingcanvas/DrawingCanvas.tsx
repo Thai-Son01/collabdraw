@@ -6,7 +6,7 @@ import {draw, setupTool} from "./drawingEvent.ts"
 export default function DrawingCanvas({pWidth, selectedTool, connection, room} : 
                                     {pWidth : number,
                                     selectedTool : string,
-                                    connection : Client | null,
+                                    connection : Client,
                                     room : string
                                     }){
 
@@ -17,15 +17,15 @@ export default function DrawingCanvas({pWidth, selectedTool, connection, room} :
     
     //this will send coordinates only
     //maybe declare in app and then pass as props
-    // function sendData() {
-    //     if (connection) {
-    //         connection.publish({destination : "/app/coordinates/" + room,
-    //             body: JSON.stringify({"x" : 1,
-    //                                   "y" : 1,
-    //                                     })
-    //             });
-    //     }
-    // }
+    function sendData() {
+        if (connection) {
+            connection.publish({destination : "/app/coordinates/" + room,
+                body: JSON.stringify({"x" : 1,
+                                      "y" : 1,
+                                        })
+                });
+        }
+    }
 
     useEffect(() => {
 
@@ -59,6 +59,7 @@ export default function DrawingCanvas({pWidth, selectedTool, connection, room} :
             }}
             onMouseMove={(e : React.MouseEvent) => {
                 if (ctxRef.current && isDrawing) {
+                    sendData();
                     draw(e, ctxRef.current, canvasRef.current as HTMLCanvasElement);
                 }
             }}
