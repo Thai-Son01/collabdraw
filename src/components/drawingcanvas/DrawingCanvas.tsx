@@ -1,11 +1,13 @@
 import { Client } from '@stomp/stompjs';
 import styles from './DrawingCanvas.module.css'
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import {draw, setupTool} from "./drawingEvent.ts"
 
-export default function DrawingCanvas({pWidth, selectedTool, connection} : 
+export default function DrawingCanvas({pWidth, selectedTool, connection, room} : 
                                     {pWidth : number,
                                     selectedTool : string,
-                                    connection : Client | null
+                                    connection : Client | null,
+                                    room : string
                                     }){
 
     
@@ -14,63 +16,19 @@ export default function DrawingCanvas({pWidth, selectedTool, connection} :
     let isDrawing : boolean = false;
     
     //this will send coordinates only
-    function sendData() {
-        if (connection) {
-            connection.publish({destination : "/app/coordinates/1",
-                body: JSON.stringify({"x" : 1,
-                                      "y" : 1,
-                                        })
-                });
-        }
-    }
-    //will need to create functions in here is getting kinda big
-    function getMousePosition(canvas : HTMLCanvasElement, event : React.MouseEvent ) : [number, number] {
-            let rect = canvas.getBoundingClientRect();
-            let scaleX = canvas.width / rect.width;
-            let scaleY = canvas.height / rect.height;
-            let x = (event.clientX - rect.left) * scaleX;
-            let y = (event.clientY - rect.top) * scaleY;
-            
-            return [x, y];
-    }
-
-    //maybe this should take x y coord instead of event
-    function draw(e : React.MouseEvent, ctx : CanvasRenderingContext2D) {
-        let [currentX, currentY] = getMousePosition(canvasRef.current as HTMLCanvasElement, e);
-        ctx.lineTo(currentX, currentY);
-        ctx.moveTo(currentX, currentY)
-        ctx.stroke();
-        sendData();
-    }
-
-    function setupTool(e : React.MouseEvent,
-                       ctx : CanvasRenderingContext2D, 
-                       tool : string,
-                       toolWidth : number) {
-
-        switch(tool) {
-            case "pen" : {
-                ctx.globalCompositeOperation = "source-over";
-                break;
-            }
-            case "eraser" : {
-                ctx.globalCompositeOperation = "destination-out";
-                break;
-            }
-            default : break;
-        }
-        ctx.lineWidth = toolWidth;
-        ctx.lineCap = "round";
-        let [startX, startY] = getMousePosition(canvasRef.current as HTMLCanvasElement, e);
-        ctx.beginPath();
-        ctx.lineTo(startX, startY);
-        ctx.moveTo(startX, startY);
-        ctx.stroke();
-        sendData();
-
-    }
+    //maybe declare in app and then pass as props
+    // function sendData() {
+    //     if (connection) {
+    //         connection.publish({destination : "/app/coordinates/" + room,
+    //             body: JSON.stringify({"x" : 1,
+    //                                   "y" : 1,
+    //                                     })
+    //             });
+    //     }
+    // }
 
     useEffect(() => {
+
         if(canvasRef.current){
             canvasRef.current.focus(); //necessary?
             //has to be done somewhere else for initial setup?
@@ -94,14 +52,14 @@ export default function DrawingCanvas({pWidth, selectedTool, connection} :
                 if (!isDrawing) {
                     isDrawing = true;
                     if (ctxRef.current) {
-                        setupTool(e, ctxRef.current, selectedTool, pWidth); //called everytime scuffed?
+                        setupTool(e, ctxRef.current, selectedTool, pWidth, canvasRef.current as HTMLCanvasElement); //called everytime scuffed?
                         //width is set only when drawing dont know if that is what we want!
                     }
                 }
             }}
             onMouseMove={(e : React.MouseEvent) => {
                 if (ctxRef.current && isDrawing) {
-                    draw(e, ctxRef.current);
+                    draw(e, ctxRef.current, canvasRef.current as HTMLCanvasElement);
                 }
             }}
             onMouseUp={() => {
