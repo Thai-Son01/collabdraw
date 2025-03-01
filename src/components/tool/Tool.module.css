@@ -1,9 +1,15 @@
 .toolIcon {
-    height:100%;
-    background-color: rgb(43, 38, 48);
+    height: 100%;
 }
 
+.toolIcon:hover {
+    background-color: rgb(101, 84, 121);
+}
 
-.selected {
+.toolIcon.selected {
+    background-color: rgb(78, 55, 105);
+}
+
+.toolIcon.selected:hover {
     background-color: rgb(78, 55, 105);
 }
