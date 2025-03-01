@@ -69,3 +69,11 @@ html, body {
   margin-right: auto;
   right : 10%;
 }
+
+.appDiv {
+  margin: 0;        /* Remove default margin */
+  padding: 0;       /* Remove default padding */
+  height: 100%;     /* Make sure html and body take full height */
+  overflow: hidden; /* Prevent scrollbars from appearing */
+  z-index: 15;
+}

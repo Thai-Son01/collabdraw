@@ -38,8 +38,6 @@ function setupTool(e : React.MouseEvent,
         default : break;
     }
     ctx.lineWidth = toolWidth;
-    console.log(`width : ${toolWidth}`);
-    console.log(ctx.lineWidth);
     let [startX, startY] = getMousePosition(canvas, e);
     ctx.beginPath();
     ctx.lineCap = "round";
