@@ -37,6 +37,7 @@ function setupTool(e : React.MouseEvent,
         }
         default : break;
     }
+    // ctx.fillStyle = "rgb(209, 202, 219)";
     ctx.lineWidth = toolWidth;
     ctx.lineCap = "round";
     let [startX, startY] = getMousePosition(canvas, e);

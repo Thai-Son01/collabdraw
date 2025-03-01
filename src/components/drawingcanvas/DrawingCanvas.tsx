@@ -36,7 +36,7 @@ export default function DrawingCanvas({pWidth, selectedTool, connection, room} :
             canvasRef.current.height = window.innerHeight;
             const ctx = canvasRef.current.getContext("2d");
             if (ctx) {
-                ctx.fillStyle = "rgb(200 0 0)";
+                ctx.strokeStyle = "rgb(209, 202, 219)";
                 ctx.lineWidth = pWidth;
                 ctx.lineCap = "round";                  
                 ctxRef.current = ctx;
@@ -59,7 +59,7 @@ export default function DrawingCanvas({pWidth, selectedTool, connection, room} :
             }}
             onMouseMove={(e : React.MouseEvent) => {
                 if (ctxRef.current && isDrawing) {
-                    sendData();
+                    // sendData();
                     draw(e, ctxRef.current, canvasRef.current as HTMLCanvasElement);
                 }
             }}
