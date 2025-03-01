@@ -9,11 +9,9 @@ import throttle from 'lodash.throttle'
 
 function App() {
 
-  //this is really ugly
-  //need to remove websocket from the component
   const WS_URL = "ws://localhost:8080/gs-guide-websocket";
-  // const [websocketConnection, setWebsocketConnection] = useState<Client | null>(null); //xd state?
-  const roomIdentifier = useRef(crypto.randomUUID());
+  // const roomIdentifier = useRef(crypto.randomUUID());
+  const roomIdentifier = useRef("1");
   const userIdentifier = useRef(crypto.randomUUID());
   
   //this thing should be an object?
@@ -23,50 +21,6 @@ function App() {
 
   const connection = useWebsocketConnection(userIdentifier.current,
                                            roomIdentifier.current, WS_URL) as Client; //random cast sinon ca chiale
-
-  // useEffect(() => {
-  //   const client = new Client({
-
-  //     brokerURL: WS_URL,
-
-  //     connectHeaders : {
-  //       "user-id" : userIdentifier.current,
-  //       "room" : roomIdentifier.current
-  //     },
-
-  //     onStompError : (frame) => {
-  //       console.log("wtf is happenign man", frame);
-  //     },
-      
-  //     onWebSocketError: (error) => {
-  //       console.log("websocket error", error);
-  //     },
-  //     onConnect: () => {
-  //       client.subscribe("/topic/greetings", message => {
-  //         console.log(message);
-  //         }
-  //       );
-  //       console.log(client.connected);
-
-  //       client.publish({destination : "/app/hello",
-  //         body: JSON.stringify({'name': userIdentifier.current})
-  //         });
-  //       client.publish({destination: "/app/connect/" + roomIdentifier.current,
-  //         body : JSON.stringify({"name" : userIdentifier.current})
-  //       });
-
-  //       console.log("connected to server through websocket");
-  //     },
-      
-  //   });
-  //   client.activate();
-  //   setWebsocketConnection(client);
-
-  //   return () => {
-  //     //cleanup here do i need to?
-  //     websocketConnection?.deactivate();
-  //   }
-  // }, [])
 
   function changeValue(value : number) {
     setPenWidth(value);

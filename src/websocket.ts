@@ -30,16 +30,29 @@ export default function useWebsocketConnection(userId : string, room : string, s
                 //testing purpose
                 client.subscribe("/topic/greetings", message => {
                 console.log(message);
-                }
-                );
+                });
+
+
                 console.log(client.connected);
 
-                client.publish({destination : "/app/hello",
-                body: JSON.stringify({'name': userId})
-                    });
+                // client.publish({destination : "/app/hello",
+                // body: JSON.stringify({'name': userId})
+                //     });
+                client.publish({destination : "/app/connect/" + room,
+                        body: JSON.stringify({'name': userId})
+                            });
+
+                // console.log(`/user/${userId}/queue/${room}`);
+
+                client.subscribe(`/user/queue/${room}`, message => {
+                    console.log("THIS SHOULD WORK CMON MAN")
+                    console.log(message);
+                })
 
                 console.log("connected to server through websocket");
+
                 }
+
                 //testing purpose
 
             })
