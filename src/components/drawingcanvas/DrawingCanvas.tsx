@@ -47,7 +47,6 @@ export default function DrawingCanvas({pWidth, selectedTool, connection, room} :
         }, [])
 
         //need to fix cursor not totally accurate when clicking. on peut voir que le stroke commence un peu plus loin
-        //linewidth bugs. does not change correctly
         //anti aliasing not good. need more smooth
         return (<canvas
             className ={`${styles.drawingCanvas}`}

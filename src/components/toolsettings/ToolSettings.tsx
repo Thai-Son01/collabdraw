@@ -11,7 +11,7 @@ export default function ToolSettings({changeValue, defaultValue, currentTool} :
     >
         <input
         type="range"
-        min="0"
+        min="1"
         max="100"
         value= {defaultValue}
         onChange={(e) => changeValue(Number(e.target.value))}
