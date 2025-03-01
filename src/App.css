@@ -53,3 +53,19 @@ html, body {
   margin : 0;
   padding : 0;
 }
+
+.shareButton {
+  display: flex;
+  flex-direction: row;
+  margin-top: 10px;
+  padding: 5px;
+  gap: 4px;
+  background-color: rgb(55, 46, 66);
+  position: absolute;
+  height: 5vh;
+  width: fit-content;
+  z-index: 10;
+  margin-left: auto;
+  margin-right: auto;
+  right : 10%;
+}

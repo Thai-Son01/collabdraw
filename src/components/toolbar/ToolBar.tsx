@@ -11,7 +11,6 @@ export default function ToolBar({changePenWidth, defaultPenWidth, changeSelected
                                 itemSelected : string
                             }) {
 
-
     const pen = "./brush.svg";
     const eraser = "./eraser.svg";
     return (

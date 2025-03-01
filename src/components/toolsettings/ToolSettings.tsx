@@ -9,10 +9,12 @@ export default function ToolSettings({changeValue, defaultValue, currentTool} :
     return (<div
     className={`${styles.boxSetting}`}
     >
-        <input
+        <label>Width</label>
+        <input 
+        className={`${styles.slider}`}
         type="range"
         min="1"
-        max="100"
+        max="50"
         value= {defaultValue}
         onChange={(e) => changeValue(Number(e.target.value))}
         >

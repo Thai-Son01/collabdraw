@@ -6,6 +6,7 @@ import ToolBar from './components/toolbar/ToolBar'
 import {Client} from '@stomp/stompjs'
 import useWebsocketConnection from './websocket'
 import throttle from 'lodash.throttle'
+import SessionInterface from './components/sessionconnect/SessionInterface'
 
 function App() {
 
@@ -16,6 +17,7 @@ function App() {
   
   //this thing should be an object?
   const [penWidth, setPenWidth] = useState(10);
+  const [popupVisibility, setPopupVisibility] = useState(false);
   const [itemSelected, setItemSelected] = useState("pen");
   const [opacityLevel, setOpacityLevel] = useState(100);
 
@@ -33,7 +35,22 @@ function App() {
 
 
   return (
-    <>
+    <div
+    onClick={(e) =>{
+      e.stopPropagation();
+      setPopupVisibility(false);
+      console.log("div is clicked");}
+    }
+    >
+      <button
+      className='shareButton'
+      onClick={(e)=> {
+        e.stopPropagation();
+        setPopupVisibility(true);}
+      }
+      >
+        CLICK ME
+      </button>
       <ToolBar
       changePenWidth = {changeValue}
       defaultPenWidth = {penWidth}
@@ -49,7 +66,12 @@ function App() {
       ></DrawingCanvas>
       
       <Chat></Chat>
-    </>
+      <SessionInterface
+      visibility = {popupVisibility}
+      >
+      </SessionInterface>
+
+      </div>
   )
 }
 

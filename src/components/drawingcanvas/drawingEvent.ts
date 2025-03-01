@@ -40,9 +40,10 @@ function setupTool(e : React.MouseEvent,
     ctx.lineWidth = toolWidth;
     console.log(`width : ${toolWidth}`);
     console.log(ctx.lineWidth);
-    ctx.lineCap = "round";
     let [startX, startY] = getMousePosition(canvas, e);
     ctx.beginPath();
+    ctx.lineCap = "round";
+    // ctx.lineJoin ="round";
     ctx.translate(0.5, 0.5);
     ctx.lineTo(startX, startY);
     ctx.moveTo(startX, startY);
