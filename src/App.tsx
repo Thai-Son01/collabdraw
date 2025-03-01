@@ -23,6 +23,7 @@ function App() {
                                            roomIdentifier.current, WS_URL) as Client; //random cast sinon ca chiale
 
   function changeValue(value : number) {
+    console.log(`new width value : ${value}`);
     setPenWidth(value);
     
   }

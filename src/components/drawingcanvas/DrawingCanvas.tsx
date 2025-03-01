@@ -36,6 +36,8 @@ export default function DrawingCanvas({pWidth, selectedTool, connection, room} :
             canvasRef.current.height = window.innerHeight;
             const ctx = canvasRef.current.getContext("2d");
             if (ctx) {
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = "high";
                 ctx.strokeStyle = "rgb(209, 202, 219)";
                 ctx.lineWidth = pWidth;
                 ctx.lineCap = "round";                  
@@ -45,7 +47,8 @@ export default function DrawingCanvas({pWidth, selectedTool, connection, room} :
         }, [])
 
         //need to fix cursor not totally accurate when clicking. on peut voir que le stroke commence un peu plus loin
-
+        //linewidth bugs. does not change correctly
+        //anti aliasing not good. need more smooth
         return (<canvas
             className ={`${styles.drawingCanvas}`}
             onMouseDown={(e : React.MouseEvent)=> {

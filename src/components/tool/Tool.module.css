@@ -1,9 +1,9 @@
 .toolIcon {
     height:100%;
-    background-color: orange;
+    background-color: rgb(43, 38, 48);
 }
 
 
 .selected {
-    background-color: gold;
+    background-color: rgb(78, 55, 105);
 }
