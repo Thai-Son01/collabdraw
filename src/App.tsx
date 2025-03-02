@@ -42,7 +42,6 @@ function setModal(visibility : boolean) {
       <button
       className='shareButton'
       onClick={(e)=> {
-        e.stopPropagation();
         setPopupVisibility(true);}
       }
       >
@@ -63,6 +62,7 @@ function setModal(visibility : boolean) {
       ></DrawingCanvas>
       
       <Chat></Chat>
+
       <SessionInterface
       changeVisibility={setModal}
       visibility = {popupVisibility}

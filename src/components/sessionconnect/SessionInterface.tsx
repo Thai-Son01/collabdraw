@@ -7,19 +7,11 @@ export default function SessionInterface({visibility, changeVisibility} :
                                         }) {
     const dialog = useRef<HTMLDialogElement>(null);
     
-    console.log(visibility);
-
     if (visibility) {
         if (dialog.current && !dialog.current.open) {
             dialog.current.showModal();
         }
     }
-    else {
-        if (dialog.current && dialog.current.open) {
-            dialog.current.close();
-        }
-    }
-
     
     return (
     <>

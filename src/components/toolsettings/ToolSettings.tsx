@@ -7,7 +7,7 @@ export default function ToolSettings({changeValue, defaultValue, currentTool} :
                                     currentTool : string}) {
 
     return (<div
-    className={`${styles.boxSetting}`}
+        className={`${styles.boxSetting}`}
     >
         <label>Width</label>
         <input 
@@ -20,9 +20,18 @@ export default function ToolSettings({changeValue, defaultValue, currentTool} :
         >
         </input>
 
-    <div 
-    className={`${currentTool === "pen" ? styles.show: styles.hide}`}
+        <div 
+            className={`${currentTool === "pen" ? styles.show: styles.hide}`}
     >
-        colours will be here</div>
+        <div>RED</div>
+        <div>RED</div>
+        <div>RED</div>
+        <div>RED</div>
+        <div>RED</div>
+        <div>RED</div>
+        <div>RED</div>
+        <div>RED</div>
+        <div>RED</div>
+        </div>
     </div>)
 }
