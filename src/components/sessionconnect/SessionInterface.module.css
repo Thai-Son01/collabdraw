@@ -6,44 +6,20 @@
     display: none;
 }
 
-
-.interface{
-    margin: 0;
-    padding: 0;
-    border: 10px solid red;
-    background-color: greenyellow;
-    height: 20vh;
-    width: 35vw;
-    font-size: 15px;
-    text-align: center;
-    vertical-align: middle;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    margin-inline: auto; 
-    z-index: 20;
+.sessionDialog {
+  margin: 0;
+  padding: 0;
+  border: 10px solid red;
+  background-color: greenyellow;
+  height: 20vh;
+  width: 35vw;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translateX(-50%) translateY(-50%);
+  -moz-transform: translateX(-50%) translateY(-50%);
+  -ms-transform: translateX(-50%) translateY(-50%);
+  transform: translateX(-50%) translateY(-50%);
 }
-
-::backdrop {
-    background-image:
-    radial-gradient(
-      circle,
-      #fff 0 5vw,
-      transparent 5vw 20vw,
-      #fff 20vw 22.5vw,
-      #eee 22.5vw
-    ),
-    conic-gradient(
-      #272b66 0 50grad,
-      #2d559f 50grad 100grad,
-      #9ac147 100grad 150grad,
-      #639b47 150grad 200grad,
-      #e1e23b 200grad 250grad,
-      #f7941e 250grad 300grad,
-      #662a6c 300grad 350grad,
-      #9a1d34 350grad 400grad,
-      #43a1cd 100grad 150grad,
-      #ba3e2e
-    );
+dialog::backdrop {
+  backdrop-filter: blur(0.5px);
 }

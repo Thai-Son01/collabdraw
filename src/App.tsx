@@ -38,7 +38,8 @@ function App() {
     onClick={(e) =>{
       e.stopPropagation();
       setPopupVisibility(false);
-      console.log("div is clicked");}
+      console.log("clicked outside");
+      }
     }
     >
       <button

@@ -1,24 +1,27 @@
-import { useRef, useEffect } from 'react';
+import { useRef} from 'react';
 import styles from './SessionInterface.module.css'
 
 export default function SessionInterface({visibility} : {visibility : boolean}) {
     const dialog = useRef<HTMLDialogElement>(null);
     
+    console.log(visibility);
+
     if (visibility) {
-        if (dialog.current) {
+        if (dialog.current && !dialog.current.open) {
             dialog.current.showModal();
         }
-        else {
-            console.log("there is no dialog");
+    }
+    else {
+        if (dialog.current && dialog.current.open) {
+            dialog.current.close();
         }
     }
 
     
     return (<dialog
-        className={`${styles.interface}`}
+        className={`${styles.sessionDialog}`}
         ref = {dialog}
     >
         <button>close button</button>
-        hello
     </dialog>)
 }
