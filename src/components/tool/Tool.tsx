@@ -6,11 +6,10 @@ export default function Tool({sourceName, name, onSelect, selected} :
                             selected : string}
                         ) {
     
-    return (<img className = {`${styles.toolIcon}` + `${selected === name ? (" " + styles.selected) : ""}`}
+    return (<img className = {`${styles.toolIcon}` + `${selected === name ? (" " + styles.selected) : ""}`} //this is where highlight happens
         src = {sourceName}
         alt="does not work"
         onClick={() => {
-            console.log(`clicked on ${name}`)
-            onSelect(name);}}
+            onSelect(name);}} //changing name of selected tool
         ></img>)
 }

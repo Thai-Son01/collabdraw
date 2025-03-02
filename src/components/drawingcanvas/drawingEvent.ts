@@ -21,12 +21,11 @@ function draw(e : React.MouseEvent, ctx : CanvasRenderingContext2D, canvas : HTM
 
 function setupTool(e : React.MouseEvent,
                     ctx : CanvasRenderingContext2D, 
-                    tool : string,
-                    toolWidth : number,
+                    tool : any,
                     canvas : HTMLCanvasElement
                 ) {
 
-    switch(tool) {
+    switch(tool.tool) {
         case "pen" : {
             ctx.globalCompositeOperation = "source-over";
             break;
@@ -37,7 +36,7 @@ function setupTool(e : React.MouseEvent,
         }
         default : break;
     }
-    ctx.lineWidth = toolWidth;
+    ctx.lineWidth = tool.width;
     let [startX, startY] = getMousePosition(canvas, e);
     ctx.beginPath();
     ctx.lineCap = "round";

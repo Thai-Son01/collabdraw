@@ -3,9 +3,9 @@ import styles from './DrawingCanvas.module.css'
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {draw, setupTool} from "./drawingEvent.ts"
 
-export default function DrawingCanvas({pWidth, selectedTool, connection, room} : 
-                                    {pWidth : number,
-                                    selectedTool : string,
+export default function DrawingCanvas({selectedTool, connection, room} : 
+                                    {
+                                    selectedTool : any, //trop paresseux de changer type pour l'instant
                                     connection : Client,
                                     room : string
                                     }){
@@ -38,8 +38,10 @@ export default function DrawingCanvas({pWidth, selectedTool, connection, room} :
             if (ctx) {
                 ctx.imageSmoothingEnabled = true;
                 ctx.imageSmoothingQuality = "high";
-                ctx.strokeStyle = "rgb(209, 202, 219)";
-                ctx.lineWidth = pWidth;
+                // ctx.strokeStyle = "rgb(209, 202, 219)";
+                // ctx.lineWidth = pWidth;
+                ctx.strokeStyle = selectedTool.colour;
+                ctx.lineWidth = selectedTool.width;
                 ctx.lineCap = "round";                  
                 ctxRef.current = ctx;
             }
@@ -54,7 +56,7 @@ export default function DrawingCanvas({pWidth, selectedTool, connection, room} :
                 if (!isDrawing) {
                     isDrawing = true;
                     if (ctxRef.current) {
-                        setupTool(e, ctxRef.current, selectedTool, pWidth, canvasRef.current as HTMLCanvasElement); //called everytime scuffed?
+                        setupTool(e, ctxRef.current, selectedTool, canvasRef.current as HTMLCanvasElement); //called everytime scuffed?
                         //width is set only when drawing dont know if that is what we want!
                     }
                 }

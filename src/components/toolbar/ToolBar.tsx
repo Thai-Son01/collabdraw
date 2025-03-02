@@ -18,8 +18,8 @@ export default function ToolBar({changePenWidth, defaultPenWidth, changeSelected
     className={`${styles.toolBar}`}>
         <Tool 
         sourceName = {pen}
-        name = "pen"
-        selected = {itemSelected}
+        name = "pen" //why am i giving name here
+        selected = {itemSelected} //i could give the boolean here instead
         onSelect = {changeSelectedTool}
         ></Tool>
 

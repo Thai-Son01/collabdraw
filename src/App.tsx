@@ -15,16 +15,44 @@ function App() {
   const roomIdentifier = useRef("1");
   const userIdentifier = useRef(crypto.randomUUID());
   
+  const defaultPen = {
+    "tool" : "pen",
+    "width" : 10,
+    "opacity" : 100,
+    "colour" : "rgb(209, 202, 219)",
+
+  }
+
+  const defaultEraser = {
+    "tool" : "eraser",
+    "width" : 10,
+    "opacity" : 100,
+
+  }
   //this thing should be an object?
   const [penWidth, setPenWidth] = useState(10);
   const [popupVisibility, setPopupVisibility] = useState(false);
-  const [itemSelected, setItemSelected] = useState("pen");
-  const [opacityLevel, setOpacityLevel] = useState(100);
+  const [itemSelected, setItemSelected] = useState("pen"); //id of selected tool
+  const [currentTool, setCurrentTool] = useState(defaultPen);
 
   const connection = useWebsocketConnection(userIdentifier.current,
                                            roomIdentifier.current, WS_URL) as Client; //random cast sinon ca chiale
 
+
+  function modifyToolWidth(value :number) {
+
+  }
+
+  function modifyToolOpacity(value : number) {
+
+  }
+
+  function modifyToolColour(value : string) {
+
+  }
+
   function changeValue(value : number) {
+
     setPenWidth(value);
     
   }
@@ -48,16 +76,15 @@ function setModal(visibility : boolean) {
         CLICK ME
       </button>
       <ToolBar
-      changePenWidth = {changeValue}
-      defaultPenWidth = {penWidth}
-      itemSelected= {itemSelected}
-      changeSelectedTool={toolOnClick}
+      changePenWidth = {changeValue} //function for slider to change pen
+      defaultPenWidth = {penWidth} //sets default value in the slider
+      itemSelected= {itemSelected} //uses id to highlight item if selected
+      changeSelectedTool={toolOnClick} //changes id of selected item
       ></ToolBar>
 
       <DrawingCanvas
       connection = {connection}
-      pWidth = {penWidth}
-      selectedTool= {itemSelected}
+      selectedTool= {currentTool}
       room = {roomIdentifier.current}
       ></DrawingCanvas>
       
