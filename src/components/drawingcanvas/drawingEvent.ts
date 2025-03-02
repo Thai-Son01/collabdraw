@@ -41,7 +41,6 @@ function setupTool(e : React.MouseEvent,
     let [startX, startY] = getMousePosition(canvas, e);
     ctx.beginPath();
     ctx.lineCap = "round";
-    // ctx.lineJoin ="round";
     ctx.translate(0.5, 0.5);
     ctx.lineTo(startX, startY);
     ctx.moveTo(startX, startY);
