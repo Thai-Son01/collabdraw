@@ -6,10 +6,12 @@
     display: none;
 }
 
+
+dialog {
+  border:0;
+  padding:0;
+}
 .sessionDialog {
-  margin: 0;
-  padding: 0;
-  border: 10px solid red;
   background-color: greenyellow;
   height: 20vh;
   width: 35vw;

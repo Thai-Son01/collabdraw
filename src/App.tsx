@@ -32,16 +32,13 @@ function App() {
     setItemSelected(id);
 }
 
+function setModal(visibility : boolean) {
+  setPopupVisibility(visibility);
+}
+
 
   return (
-    <div
-    onClick={(e) =>{
-      e.stopPropagation();
-      setPopupVisibility(false);
-      console.log("clicked outside");
-      }
-    }
-    >
+    <div>
       <button
       className='shareButton'
       onClick={(e)=> {
@@ -67,6 +64,7 @@ function App() {
       
       <Chat></Chat>
       <SessionInterface
+      changeVisibility={setModal}
       visibility = {popupVisibility}
       >
       </SessionInterface>
