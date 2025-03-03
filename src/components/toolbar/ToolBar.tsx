@@ -5,10 +5,10 @@ import { useState } from 'react';
 
 
 export default function ToolBar({changePenWidth, defaultPenWidth, changeSelectedTool, itemSelected} : 
-                                {changePenWidth : (value : number) => void,
+                                {changePenWidth : any,
                                 defaultPenWidth : number, 
                                 changeSelectedTool : (tool : string) => void,
-                                itemSelected : string
+                                itemSelected : any
                             }) {
 
     const pen = "./brush.svg";
@@ -19,14 +19,15 @@ export default function ToolBar({changePenWidth, defaultPenWidth, changeSelected
         <Tool 
         sourceName = {pen}
         name = "pen" //why am i giving name here
-        selected = {itemSelected} //i could give the boolean here instead
-        onSelect = {changeSelectedTool}
+        selected = {itemSelected.tool === "pen"} //i could give the boolean here instead
+        //needs so have the settings of pen to change properties, so has to give eraser and pen...
+        onSelect = {changeSelectedTool} //right now it's only here for the highlight, does not change the tool properties
         ></Tool>
 
         <Tool 
         sourceName = {eraser}
         name = "eraser"
-        selected = {itemSelected}
+        selected = {itemSelected.tool === "eraser"}
         onSelect = {changeSelectedTool}
         ></Tool>
 

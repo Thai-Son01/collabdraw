@@ -3,10 +3,10 @@ import styles from "./Tool.module.css"
 export default function Tool({sourceName, name, onSelect, selected} : 
                             {sourceName : string, name : string, 
                             onSelect : (id : string) => void,
-                            selected : string}
+                            selected : boolean}
                         ) {
     
-    return (<img className = {`${styles.toolIcon}` + `${selected === name ? (" " + styles.selected) : ""}`} //this is where highlight happens
+    return (<img className = {`${styles.toolIcon}` + `${selected? (" " + styles.selected) : ""}`} //this is where highlight happens
         src = {sourceName}
         alt="does not work"
         onClick={() => {

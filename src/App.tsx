@@ -20,7 +20,6 @@ function App() {
     "width" : 10,
     "opacity" : 100,
     "colour" : "rgb(209, 202, 219)",
-
   }
 
   const defaultEraser = {
@@ -29,28 +28,39 @@ function App() {
     "opacity" : 100,
 
   }
-  //this thing should be an object?
+  //ce truc pourrait meme etre dans un autre fichier je pense
+  const inventory = useRef({
+    "pen" : defaultPen,
+    "eraser" : defaultEraser
+  })
+
+  const inventory2 = {
+    "pen" : defaultPen,
+    "eraser" : defaultEraser
+  }
+
+  const [toolInventory, setToolInventory] = useState(inventory2);
   const [penWidth, setPenWidth] = useState(10);
   const [popupVisibility, setPopupVisibility] = useState(false);
   const [itemSelected, setItemSelected] = useState("pen"); //id of selected tool
-  const [currentTool, setCurrentTool] = useState(defaultPen);
 
   const connection = useWebsocketConnection(userIdentifier.current,
                                            roomIdentifier.current, WS_URL) as Client; //random cast sinon ca chiale
 
+  
 
-  function modifyToolWidth(value :number) {
-
+  function modifyValue(toolType : string, property : string, value : number | string) {
+    let clonedInventory = structuredClone(toolInventory);
+    console.log("BEFORE CHANGING");
+    console.log(clonedInventory);
+    clonedInventory[toolType][property] = value;
+    console.log("AFTER CHANGING");
+    console.log(clonedInventory);
+    // let clonedTool = structuredClone(clonedInventory[toolType]);
+    // clonedTool[property] = value;
+    setToolInventory(clonedInventory);
+    
   }
-
-  function modifyToolOpacity(value : number) {
-
-  }
-
-  function modifyToolColour(value : string) {
-
-  }
-
   function changeValue(value : number) {
 
     setPenWidth(value);
@@ -64,7 +74,6 @@ function setModal(visibility : boolean) {
   setPopupVisibility(visibility);
 }
 
-
   return (
     <div>
       <button
@@ -75,16 +84,21 @@ function setModal(visibility : boolean) {
       >
         CLICK ME
       </button>
+
+
       <ToolBar
-      changePenWidth = {changeValue} //function for slider to change pen
+      //ca devrait etre un modify tool en general? pour set le tool
+      changePenWidth = {modifyValue} //function for slider to change pen
+      //peut juste donner le tool en tant que tel je pense
       defaultPenWidth = {penWidth} //sets default value in the slider
-      itemSelected= {itemSelected} //uses id to highlight item if selected
+      //same here donner le tool en tant que tel or do i need to keep the id here? might need to keep it
+      itemSelected= {toolInventory[itemSelected]} //uses id to highlight item if selected
       changeSelectedTool={toolOnClick} //changes id of selected item
       ></ToolBar>
 
       <DrawingCanvas
       connection = {connection}
-      selectedTool= {currentTool}
+      selectedTool= {toolInventory[itemSelected]} //underlined red mais ca a l'air de marcher
       room = {roomIdentifier.current}
       ></DrawingCanvas>
       
