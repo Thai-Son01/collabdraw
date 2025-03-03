@@ -4,11 +4,10 @@ import styles from './ToolBar.module.css'
 import { useState } from 'react';
 
 
-export default function ToolBar({changePenWidth, defaultPenWidth, changeSelectedTool, itemSelected} : 
-                                {changePenWidth : any,
-                                defaultPenWidth : number, 
+export default function ToolBar({modifyTool, changeSelectedTool, itemSelected} : 
+                                {modifyTool : any, //a changer
                                 changeSelectedTool : (tool : string) => void,
-                                itemSelected : any
+                                itemSelected : any //a changer
                             }) {
 
     const pen = "./brush.svg";
@@ -18,10 +17,9 @@ export default function ToolBar({changePenWidth, defaultPenWidth, changeSelected
     className={`${styles.toolBar}`}>
         <Tool 
         sourceName = {pen}
-        name = "pen" //why am i giving name here
-        selected = {itemSelected.tool === "pen"} //i could give the boolean here instead
-        //needs so have the settings of pen to change properties, so has to give eraser and pen...
-        onSelect = {changeSelectedTool} //right now it's only here for the highlight, does not change the tool properties
+        name = "pen"
+        selected = {itemSelected.tool === "pen"}
+        onSelect = {changeSelectedTool}
         ></Tool>
 
         <Tool 
@@ -32,8 +30,7 @@ export default function ToolBar({changePenWidth, defaultPenWidth, changeSelected
         ></Tool>
 
         <ToolSettings
-        defaultValue = {defaultPenWidth}
-        changeValue = {changePenWidth}
+        changeValue = {modifyTool}
         currentTool= {itemSelected}
         ></ToolSettings>
     </div>

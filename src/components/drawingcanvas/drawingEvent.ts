@@ -37,10 +37,11 @@ function setupTool(e : React.MouseEvent,
         default : break;
     }
     ctx.lineWidth = tool.width;
+    ctx.strokeStyle = tool.colour;
+    ctx.globalAlpha = tool.opacity;
     let [startX, startY] = getMousePosition(canvas, e);
     ctx.beginPath();
     ctx.lineCap = "round";
-    ctx.translate(0.5, 0.5);
     ctx.lineTo(startX, startY);
     ctx.moveTo(startX, startY);
     ctx.stroke();

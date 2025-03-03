@@ -1,10 +1,10 @@
 import styles from './ToolSettings.module.css'
 
 
-export default function ToolSettings({changeValue, defaultValue, currentTool} : 
-                                    {changeValue : any, 
-                                    defaultValue : number, 
-                                    currentTool : any}) {
+export default function ToolSettings({changeValue, currentTool} : 
+                                    {changeValue : any, //a changer
+                                    currentTool : any}) //a changer
+{
 
     return (<div
         className={`${styles.boxSetting}`}
@@ -16,23 +16,23 @@ export default function ToolSettings({changeValue, defaultValue, currentTool} :
         min="1"
         max="50"
         value= {currentTool.width}
-        //change width here
         onChange={(e) => {
             changeValue(currentTool.tool, "width", parseInt(e.target.value));
         }}
         >
 
         </input>
+
         <label>Opacity</label>
         <input 
         className={`${styles.slider}`}
         type="range"
         min="0"
-        max="100"
+        max="1"
+        step="0.01"
         value= {currentTool.opacity}
-        //change opacity here
         onChange={(e) => {
-            changeValue(currentTool.tool, "opacity", parseInt(e.target.value)) }
+            changeValue(currentTool.tool, "opacity", parseFloat(e.target.value)) }
         }
         >
         </input>

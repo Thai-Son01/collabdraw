@@ -28,7 +28,6 @@ export default function DrawingCanvas({selectedTool, connection, room} :
     }
 
     useEffect(() => {
-
         if(canvasRef.current){
             canvasRef.current.focus(); //necessary?
             //has to be done somewhere else for initial setup?
@@ -36,11 +35,8 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             canvasRef.current.height = window.innerHeight;
             const ctx = canvasRef.current.getContext("2d");
             if (ctx) {
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = "high";
-                // ctx.strokeStyle = "rgb(209, 202, 219)";
-                // ctx.lineWidth = pWidth;
                 ctx.strokeStyle = selectedTool.colour;
+                ctx.globalAlpha = selectedTool.opacity; //does not work nvm it does
                 ctx.lineWidth = selectedTool.width;
                 ctx.lineCap = "round";                  
                 ctxRef.current = ctx;

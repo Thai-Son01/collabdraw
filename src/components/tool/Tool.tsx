@@ -10,6 +10,6 @@ export default function Tool({sourceName, name, onSelect, selected} :
         src = {sourceName}
         alt="does not work"
         onClick={() => {
-            onSelect(name);}} //changing name of selected tool
+            onSelect(name);}}
         ></img>)
 }
