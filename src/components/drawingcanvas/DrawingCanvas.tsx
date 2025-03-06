@@ -1,10 +1,11 @@
 import { Client } from '@stomp/stompjs';
 import styles from './DrawingCanvas.module.css'
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { tool } from '../../interface';
 
 export default function DrawingCanvas({selectedTool, connection, room} : 
                                     {
-                                    selectedTool : any, //trop paresseux de changer type pour l'instant
+                                    selectedTool : tool, //trop paresseux de changer type pour l'instant
                                     connection : Client,
                                     room : string
                                     }){
@@ -28,7 +29,8 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             if (ctx){
                 //when page hot reloads and eraser was picked, crashes the website because there is no colour
                 ctx.lineCap = "round";
-                ctx.strokeStyle = `rgba(${selectedTool.colour[0]}  
+                if (selectedTool.colour)
+                    ctx.strokeStyle = `rgba(${selectedTool.colour[0]}  
                                           ${selectedTool.colour[1]} 
                                           ${selectedTool.colour[2]} / 
                                           ${selectedTool.opacity}%)`
@@ -79,18 +81,21 @@ export default function DrawingCanvas({selectedTool, connection, room} :
                     context = drawingCtxRef.current;
                     context.globalCompositeOperation = "source-over";
                     displayCtxRef.current!.globalCompositeOperation = "source-over"; //!!
-                    context.strokeStyle = `rgba(${selectedTool.colour[0]}  
+                    if(selectedTool.colour)
+                        context.strokeStyle = `rgba(${selectedTool.colour[0]}  
                                                     ${selectedTool.colour[1]} 
                                                     ${selectedTool.colour[2]} / 
                                                     ${selectedTool.opacity}%)`
                 }
                 break;
-            }   
+            }
+            //same problem with eraser when opacity XDDDDD bro do i even want opacity for this then
             case "eraser" : {
                 if (displayCtxRef.current && displayCanvasRef.current) {
                     context = displayCtxRef.current;
+                    // context.strokeStyle = "rgba(0 0 0 / 10%)";
                     context.globalCompositeOperation = "destination-out";
-                    context.beginPath();
+                    context.beginPath(); // xd this function too big does too many things man
                 }
                 break;
             }

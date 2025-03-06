@@ -1,13 +1,13 @@
 import Tool from '../tool/Tool'
 import ToolSettings from '../toolsettings/ToolSettings';
 import styles from './ToolBar.module.css'
-import { useState } from 'react';
+import {changeValue, tool} from '../../interface'
 
 
 export default function ToolBar({modifyTool, changeSelectedTool, itemSelected} : 
-                                {modifyTool : any, //a changer
+                                {modifyTool : changeValue,
                                 changeSelectedTool : (tool : string) => void,
-                                itemSelected : any //a changer
+                                itemSelected : tool
                             }) {
 
     const pen = "./brush.svg";
