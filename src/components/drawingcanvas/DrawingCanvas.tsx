@@ -17,7 +17,7 @@ export default function DrawingCanvas({selectedTool, connection, room} :
     const [drawingPath, setDrawingPath] = useState<Array<Array<number>>>([]);
     const [isDrawing, setIsDrawing] = useState(false);
     
-    useEffect(() => {
+    useEffect(() => {   
 
         //les height et width ne changent jamais? si on change de taille le viewport 
         if(drawingCanvasRef.current){
@@ -26,7 +26,7 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             const ctx = drawingCanvasRef.current.getContext("2d");
             
             if (ctx){
-                //when page reloads and eraser was picked, crashes the website because there is no colour
+                //when page hot reloads and eraser was picked, crashes the website because there is no colour
                 ctx.lineCap = "round";
                 ctx.strokeStyle = `rgba(${selectedTool.colour[0]}  
                                           ${selectedTool.colour[1]} 
@@ -70,29 +70,25 @@ export default function DrawingCanvas({selectedTool, connection, room} :
 }
 
 
-    function setupTool(e : React.MouseEvent,) {
+    //i hate it
+    function setupTool(e : React.MouseEvent) {
         let context;
-        let canvas;
         switch(selectedTool.tool) {
             case "pen" : {
-                console.log("pen is selected")
-                if (drawingCtxRef.current && drawingCanvasRef.current) {
+                if (drawingCtxRef.current) {
                     context = drawingCtxRef.current;
-                    canvas = drawingCanvasRef.current;
                     context.globalCompositeOperation = "source-over";
                     displayCtxRef.current!.globalCompositeOperation = "source-over"; //!!
                     context.strokeStyle = `rgba(${selectedTool.colour[0]}  
                                                     ${selectedTool.colour[1]} 
                                                     ${selectedTool.colour[2]} / 
-                                                    ${selectedTool.opacity}%)` //hardcoded but will need to change colour property of tool
-                                                }
-                                                break;
-                                            }
+                                                    ${selectedTool.opacity}%)`
+                }
+                break;
+            }   
             case "eraser" : {
-                console.log("eraser is selected");
                 if (displayCtxRef.current && displayCanvasRef.current) {
                     context = displayCtxRef.current;
-                    canvas = displayCanvasRef.current;
                     context.globalCompositeOperation = "destination-out";
                     context.beginPath();
                 }
@@ -127,8 +123,8 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             drawingCtxRef.current.clearRect(0, 0, drawingCanvasRef.current.width, drawingCanvasRef.current.height);
             drawingCtxRef.current.beginPath();
             for (const drawPoint of drawingPath) {
-                drawingCtxRef.current.moveTo(drawPoint[0], drawPoint[1]);
                 drawingCtxRef.current.lineTo(drawPoint[0], drawPoint[1]);
+                drawingCtxRef.current.moveTo(drawPoint[0], drawPoint[1]);
             }
             drawingCtxRef.current.stroke();
 
