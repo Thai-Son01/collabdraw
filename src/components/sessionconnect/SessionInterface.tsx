@@ -42,19 +42,21 @@ export default function SessionInterface({visibility, changeVisibility} :
             onClick={(event) => {
                 isInsideBounds(event);
             }}
-        >
+        >   
+            {/* should only appear when session is started */}
             <div className={`${styles.inputContainer}`}>
                 <input type="text" value = "link with room id" id = "roomId" readOnly = {true} ref={input}></input>
-                <button className={`${styles.clipboardButton}`} onClick={()=>copyToClipBoard()}>CLIP BOARD</button>
+                <button className={`${styles.clipboardButton}`} onClick={()=>copyToClipBoard()}>Copy link</button>
             </div>
-            <button className={`${styles.sessionButton}`}> START SESSION</button>
-
+            <button className={`${styles.sessionButton}`}> Start session</button>
+                
             <button className={`${styles.closeButton}`}
-            onClick={() => {
-                dialog.current?.close();
-                changeVisibility(false);
-            }}
-            >close button
+            
+                onClick={() => {
+                    dialog.current?.close();
+                    changeVisibility(false);
+                }}
+            >
             </button>
         </dialog>
     </div>
