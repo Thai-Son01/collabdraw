@@ -27,6 +27,7 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             const ctx = drawingCanvasRef.current.getContext("2d");
             
             if (ctx){
+                //when page reloads and eraser was picked, crashes the website because there is no colour
                 ctx.lineCap = "round";
                 ctx.strokeStyle = `rgba(${selectedTool.colour[0]}  
                                           ${selectedTool.colour[1]} 
@@ -41,7 +42,8 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             displayCanvasRef.current.height = window.innerHeight;
 
             const ctx = displayCanvasRef.current.getContext("2d");
-            if (ctx) 
+            if (ctx)
+                ctx.lineCap = "round";
                 displayCtxRef.current = ctx;
         }
 
@@ -69,36 +71,54 @@ export default function DrawingCanvas({selectedTool, connection, room} :
 }
 
 
-    function setupTool(e : React.MouseEvent,
-                        canvas : HTMLCanvasElement,
-                    ) {
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-            switch(selectedTool.tool) {
-                case "pen" : {
-                    ctx.globalCompositeOperation = "source-over";
-                    ctx.strokeStyle = `rgba(${selectedTool.colour[0]}  
-                                                  ${selectedTool.colour[1]} 
-                                                  ${selectedTool.colour[2]} / 
-                                                  ${selectedTool.opacity}%)` //hardcoded but will need to change colour property of tool
-                    break;
+    function setupTool(e : React.MouseEvent,) {
+        let context;
+        let canvas;
+        switch(selectedTool.tool) {
+            case "pen" : {
+                console.log("pen is selected")
+                if (drawingCtxRef.current && drawingCanvasRef.current) {
+                    context = drawingCtxRef.current;
+                    canvas = drawingCanvasRef.current;
+                    context.globalCompositeOperation = "source-over";
+                    displayCtxRef.current!.globalCompositeOperation = "source-over"; //!!
+                    context.strokeStyle = `rgba(${selectedTool.colour[0]}  
+                                                    ${selectedTool.colour[1]} 
+                                                    ${selectedTool.colour[2]} / 
+                                                    ${selectedTool.opacity}%)` //hardcoded but will need to change colour property of tool
+                                                }
+                                                break;
+                                            }
+            case "eraser" : {
+                console.log("eraser is selected");
+                if (displayCtxRef.current && displayCanvasRef.current) {
+                    context = displayCtxRef.current;
+                    canvas = displayCanvasRef.current;
+                    context.globalCompositeOperation = "destination-out";
+                    context.beginPath();
                 }
-                case "eraser" : {
-                    ctx.globalCompositeOperation = "destination-out";
-                    break;
-                }
-                default : break;
+                break;
             }
-            ctx.lineWidth = selectedTool.width;
-            let [startX, startY] = getMousePosition(canvas, e); //maybe should just give the right canvas here or better yet do we even need to change the canvas here
-            draw(startX, startY);
+            default : break;
         }
+        context!.lineWidth = selectedTool.width;
+            //casting xdddd
+        let [startX, startY] = getMousePosition(drawingCanvasRef.current as HTMLCanvasElement, e); //maybe should just give the right canvas here or better yet do we even need to change the canvas here
+        draw(startX, startY, selectedTool.tool );
     }
 
-    //why ctx as parameter if i know it's always the same one xdd
-    function draw(xPos : number, yPos : number) {
-        addPositionToPath([xPos, yPos]);
-        refresh();
+
+    function draw(xPos : number, yPos : number, currentTool : string) {
+        if (currentTool === "eraser") {
+            displayCtxRef.current?.lineTo(xPos, yPos);
+            displayCtxRef.current?.moveTo(xPos, yPos);
+            displayCtxRef.current?.stroke();
+        }
+        else {
+            addPositionToPath([xPos, yPos]);
+            refresh();
+        }
+    
     }
 
     function refresh() {
@@ -130,7 +150,7 @@ export default function DrawingCanvas({selectedTool, connection, room} :
                 if (!isDrawing && drawingCanvasRef.current) {
                     
                     setIsDrawing(true);
-                    setupTool(e, drawingCanvasRef.current);
+                    setupTool(e);
 
                 }}
             }
@@ -139,7 +159,7 @@ export default function DrawingCanvas({selectedTool, connection, room} :
                 if (drawingCtxRef.current && drawingCanvasRef.current && isDrawing) {
 
                     let [currentX, currentY] = getMousePosition(drawingCanvasRef.current, e);
-                    draw(currentX, currentY);   
+                    draw(currentX, currentY, selectedTool.tool);   
                 }
 
 
@@ -151,7 +171,7 @@ export default function DrawingCanvas({selectedTool, connection, room} :
 
                     displayCtxRef.current.drawImage(drawingCanvasRef.current, 0,0);
                     drawingCtxRef.current.clearRect(0, 0, drawingCanvasRef.current.width, drawingCanvasRef.current.height);
-                    resetPath();   
+                    resetPath();
                 }
             }}
 
