@@ -1,3 +1,4 @@
+//maybe move all this back in component
 function getMousePosition(canvas : HTMLCanvasElement, event : React.MouseEvent ) : [number, number] {
         let rect = canvas.getBoundingClientRect();
         let scaleX = canvas.width / rect.width;
@@ -12,9 +13,11 @@ function getMousePosition(canvas : HTMLCanvasElement, event : React.MouseEvent )
 //maybe this should take x y coord instead of event
 function draw(e : React.MouseEvent, ctx : CanvasRenderingContext2D, canvas : HTMLCanvasElement) {
     let [currentX, currentY] = getMousePosition(canvas, e);
+    // paths[paths.length -1].push([currentX, currentY])
     ctx.lineTo(currentX, currentY);
     ctx.moveTo(currentX, currentY)
     ctx.stroke();
+    // refresh(ctx, paths, canvas);
     //i guess la fonction ici
     // sendData();
 }
@@ -22,7 +25,7 @@ function draw(e : React.MouseEvent, ctx : CanvasRenderingContext2D, canvas : HTM
 function setupTool(e : React.MouseEvent,
                     ctx : CanvasRenderingContext2D, 
                     tool : any,
-                    canvas : HTMLCanvasElement
+                    canvas : HTMLCanvasElement,
                 ) {
 
     switch(tool.tool) {
@@ -38,8 +41,8 @@ function setupTool(e : React.MouseEvent,
     }
     ctx.lineWidth = tool.width;
     ctx.strokeStyle = tool.colour;
-    ctx.globalAlpha = tool.opacity;
     let [startX, startY] = getMousePosition(canvas, e);
+    // paths.push([[startX, startY]]);
     ctx.beginPath();
     ctx.lineCap = "round";
     ctx.lineTo(startX, startY);
@@ -49,4 +52,20 @@ function setupTool(e : React.MouseEvent,
 
 }
 
+
+function refresh(ctx : CanvasRenderingContext2D, paths : Array<Array<number>>, canvas : HTMLCanvasElement) {
+    // ctx.clearRect(0,0,canvas.width, canvas.height);
+    console.log(paths.length);
+    for (const path in paths) {
+
+        if (path.length < 1)
+            continue;
+
+        // ctx.beginPath();
+        // ctx.moveTo(path[0][0], path[0][1]);
+        // console.log(path);
+
+    }
+
+}
 export {draw, setupTool};
