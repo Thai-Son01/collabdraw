@@ -1,7 +1,6 @@
 import { Client } from '@stomp/stompjs';
 import styles from './DrawingCanvas.module.css'
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import {draw, setupTool} from "./drawingEvent.ts"
 
 export default function DrawingCanvas({selectedTool, connection, room} : 
                                     {
