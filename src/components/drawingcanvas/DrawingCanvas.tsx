@@ -15,18 +15,21 @@ export default function DrawingCanvas({selectedTool, connection, room} :
     const drawingCtxRef = useRef<CanvasRenderingContext2D>(null);
     const displayCanvasRef = useRef<HTMLCanvasElement>(null);
     const displayCtxRef = useRef<CanvasRenderingContext2D>(null);
-    const [drawingPath, setDrawingPath] = useState<Array<Array<Number>>>([]);
+    const [drawingPath, setDrawingPath] = useState<Array<Array<number>>>([]);
     const [isDrawing, setIsDrawing] = useState(false);
     
     useEffect(() => {
+
+        //les height et width ne changent jamais? si on change de taille le viewport 
         if(drawingCanvasRef.current){
             drawingCanvasRef.current.width = window.innerWidth;
             drawingCanvasRef.current.height = window.innerHeight;
             const ctx = drawingCanvasRef.current.getContext("2d");
             
             if (ctx){
-                drawingCtxRef.current = ctx;
                 ctx.lineCap = "round";
+                ctx.strokeStyle = "rgb(209 202 219 50)";
+                drawingCtxRef.current = ctx;
             }
         }
 
@@ -42,7 +45,7 @@ export default function DrawingCanvas({selectedTool, connection, room} :
         }, [])
 
 
-    function addPositionToPath(position : Array<Number>) {
+    function addPositionToPath(position : Array<number>) {
         let newPath = structuredClone(drawingPath);
         newPath.push(position);
         setDrawingPath(newPath);
@@ -80,24 +83,31 @@ export default function DrawingCanvas({selectedTool, connection, room} :
                 default : break;
             }
             ctx.lineWidth = selectedTool.width;
-            ctx.strokeStyle = selectedTool.colour;                
-            let [startX, startY] = getMousePosition(canvas, e);
-            ctx.beginPath();
-            draw(ctx, startX, startY);
-            addPositionToPath([startX, startY]);
+            ctx.strokeStyle =   "rgba(209 202 219 / 70%)" //hardcoded but will need to change colour property of tool
+            let [startX, startY] = getMousePosition(canvas, e); //maybe should just give the right canvas here or better yet do we even need to change the canvas here
+            draw(startX, startY);
         }
     }
 
     //why ctx as parameter if i know it's always the same one xdd
-    function draw(ctx : CanvasRenderingContext2D, xPos : number, yPos : number) {
-        ctx.lineTo(xPos, yPos);
-        ctx.moveTo(xPos, yPos);
-        ctx.stroke();
+    function draw(xPos : number, yPos : number) {
         addPositionToPath([xPos, yPos]);
+        refresh();
     }
 
     function refresh() {
 
+        if (drawingCanvasRef.current && drawingCtxRef.current){
+            
+            drawingCtxRef.current.clearRect(0, 0, drawingCanvasRef.current.width, drawingCanvasRef.current.height);
+            drawingCtxRef.current.beginPath();
+            for (const drawPoint of drawingPath) {
+                drawingCtxRef.current.moveTo(drawPoint[0], drawPoint[1]);
+                drawingCtxRef.current.lineTo(drawPoint[0], drawPoint[1]);
+            }
+            drawingCtxRef.current.stroke();
+
+        }
     }
 
 
@@ -112,16 +122,18 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             className ={`${styles.drawingCanvas}`}
             onMouseDown={(e : React.MouseEvent)=> {
                 if (!isDrawing && drawingCanvasRef.current) {
+                    
                     setIsDrawing(true);
-                    setupTool(e, drawingCanvasRef.current)
+                    setupTool(e, drawingCanvasRef.current);
+
                 }}
             }
 
             onMouseMove={(e : React.MouseEvent) => {
                 if (drawingCtxRef.current && drawingCanvasRef.current && isDrawing) {
+
                     let [currentX, currentY] = getMousePosition(drawingCanvasRef.current, e);
-                    draw(drawingCtxRef.current, currentX, currentY);
-                    
+                    draw(currentX, currentY);   
                 }
 
 
@@ -130,10 +142,10 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             onMouseUp={() => {
                 setIsDrawing(false);
                 if (displayCtxRef.current && drawingCanvasRef.current && drawingCtxRef.current){
+
                     displayCtxRef.current.drawImage(drawingCanvasRef.current, 0,0);
                     drawingCtxRef.current.clearRect(0, 0, drawingCanvasRef.current.width, drawingCanvasRef.current.height);
-                    resetPath();
-                    
+                    resetPath();   
                 }
             }}
 
@@ -145,12 +157,11 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             onMouseOverCapture={(e : React.MouseEvent) => {
 
                 if (drawingCtxRef.current && isDrawing) {
+
                     if (e.buttons != 0)
                         drawingCtxRef.current.beginPath();
                     else
                         setIsDrawing(false);
-
-                        
                 }
             }}
 
