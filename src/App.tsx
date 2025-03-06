@@ -7,6 +7,7 @@ import {Client} from '@stomp/stompjs'
 import useWebsocketConnection from './websocket'
 import throttle from 'lodash.throttle'
 import SessionInterface from './components/sessionconnect/SessionInterface'
+import { tool } from './interface'
 
 function App() {
 
@@ -16,14 +17,14 @@ function App() {
   const userIdentifier = useRef(crypto.randomUUID());
   
   //ce truc pourrait meme etre dans un autre fichier je pense
-  const defaultPen = {
+  const defaultPen  : tool= {
     "tool" : "pen",
     "width" : 10,
     "opacity" : 100,
     "colour" : [209, 202, 219]
   }
 
-  const defaultEraser = {
+  const defaultEraser : tool = {
     "tool" : "eraser",
     "width" : 10,
     "opacity" : 100,
@@ -62,7 +63,7 @@ function setModal(visibility : boolean) {
     <div>
       <button
       className='shareButton'
-      onClick={(e)=> {
+      onClick={()=> {
         setPopupVisibility(true);}
       }
       >
@@ -72,7 +73,7 @@ function setModal(visibility : boolean) {
       <ToolBar
       modifyTool = {modifyValue}
       itemSelected= {toolInventory[itemSelected]}
-      changeSelectedTool={toolOnClick} //changes id of selected item
+      changeSelectedTool={toolOnClick}
       ></ToolBar>
 
       <DrawingCanvas

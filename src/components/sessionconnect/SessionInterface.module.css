@@ -25,3 +25,37 @@ dialog {
 dialog::backdrop {
   backdrop-filter: blur(0.7px);
 }
+
+.closeButton {
+  position: absolute;
+  background-color: red;
+  right: 0;
+  top: 0;
+}
+
+.container {
+  position: relative;
+}
+
+
+.sessionButton {
+  position: absolute;
+  background-color: blueviolet;
+  bottom: 0;
+  left : 50%;
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+.clipboardButton {
+
+}
+
+.inputContainer {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
