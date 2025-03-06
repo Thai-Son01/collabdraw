@@ -28,8 +28,8 @@ export default function ToolSettings({changeValue, currentTool} :
         className={`${styles.slider}`}
         type="range"
         min="0"
-        max="1"
-        step="0.01"
+        max="100"
+        step="1"
         value= {currentTool.opacity}
         onChange={(e) => {
             changeValue(currentTool.tool, "opacity", parseFloat(e.target.value)) }

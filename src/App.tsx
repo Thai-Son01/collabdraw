@@ -19,14 +19,14 @@ function App() {
   const defaultPen = {
     "tool" : "pen",
     "width" : 10,
-    "opacity" : 1,
-    "colour" : "rgb(209 202 219)",
+    "opacity" : 100,
+    "colour" : [209, 202, 219]
   }
 
   const defaultEraser = {
     "tool" : "eraser",
     "width" : 10,
-    "opacity" : 1,
+    "opacity" : 100,
 
   }
   const inventory = {

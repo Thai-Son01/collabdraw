@@ -28,7 +28,10 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             
             if (ctx){
                 ctx.lineCap = "round";
-                ctx.strokeStyle = "rgb(209 202 219 50)";
+                ctx.strokeStyle = `rgba(${selectedTool.colour[0]}  
+                                          ${selectedTool.colour[1]} 
+                                          ${selectedTool.colour[2]} / 
+                                          ${selectedTool.opacity}%)`
                 drawingCtxRef.current = ctx;
             }
         }
@@ -74,6 +77,10 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             switch(selectedTool.tool) {
                 case "pen" : {
                     ctx.globalCompositeOperation = "source-over";
+                    ctx.strokeStyle = `rgba(${selectedTool.colour[0]}  
+                                                  ${selectedTool.colour[1]} 
+                                                  ${selectedTool.colour[2]} / 
+                                                  ${selectedTool.opacity}%)` //hardcoded but will need to change colour property of tool
                     break;
                 }
                 case "eraser" : {
@@ -83,7 +90,6 @@ export default function DrawingCanvas({selectedTool, connection, room} :
                 default : break;
             }
             ctx.lineWidth = selectedTool.width;
-            ctx.strokeStyle =   "rgba(209 202 219 / 70%)" //hardcoded but will need to change colour property of tool
             let [startX, startY] = getMousePosition(canvas, e); //maybe should just give the right canvas here or better yet do we even need to change the canvas here
             draw(startX, startY);
         }
