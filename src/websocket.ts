@@ -43,7 +43,6 @@ export default function useWebsocketConnection(userId : string, room : string, s
                             });
 
                 // console.log(`/user/${userId}/queue/${room}`);
-
                 client.subscribe(`/user/queue/${room}`, message => {
                     console.log("THIS SHOULD WORK CMON MAN")
                     console.log(message);

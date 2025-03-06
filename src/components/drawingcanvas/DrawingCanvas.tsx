@@ -6,8 +6,8 @@ import { tool } from '../../interface';
 export default function DrawingCanvas({selectedTool, connection, room} : 
                                     {
                                     selectedTool : tool, //trop paresseux de changer type pour l'instant
-                                    connection : Client,
-                                    room : string
+                                    connection : Client | null,
+                                    room : string | null
                                     }){
 
     
