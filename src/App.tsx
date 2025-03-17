@@ -47,14 +47,30 @@ useEffect(() => {
     let websocketClient = connectToWebSocket("test_user_id", room); //where do i put the url man
     connect(websocketClient, room);
   }
+
+  return () => {
+    disconnect();
+  };
 }, [])
 
-const connect = (client : Client, roomId : string) => {
+function connect(client : Client, roomId : string) {
   console.log("connect is called");
   setConnection(client);
   setRoomIdenfitier(roomId);
   setIsConnected(true);
   console.log("after connect");
+}
+
+function disconnect() {
+
+  if (connection) {
+    console.log("disconnecting");
+    connection.deactivate();
+    setIsConnected(false);
+    setRoomIdenfitier(null);
+    setConnection(null);
+    console.log("disconnected");
+  }
 }
 
 function modifyValue(toolType : string, property : string, value : number | string) {
@@ -101,6 +117,7 @@ function setModal(visibility : boolean) {
       changeVisibility={setModal}
       visibility = {popupVisibility}
       connectToSession = {connect}
+      disconnectFromSession = {disconnect}
       isConnected = {isConnected}
       room = {roomIdentifier !== null? roomIdentifier : null}
       >

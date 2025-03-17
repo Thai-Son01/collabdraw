@@ -3,22 +3,17 @@ import styles from './SessionInterface.module.css'
 import {Client} from '@stomp/stompjs'
 import connectToWebSocket from '../../websocket';
 
-export default function SessionInterface({visibility, changeVisibility, connectToSession, isConnected, room} : 
+export default function SessionInterface({visibility, changeVisibility, connectToSession, isConnected, room, disconnectFromSession} : 
                                         {visibility : boolean,
                                         changeVisibility : (value : boolean) => void,
                                         connectToSession : (client : Client ,roomId: string) => void,
                                         isConnected : boolean,
                                         room: string | null,
+                                        disconnectFromSession : () => void,
                                         }) {
 
     const dialog = useRef<HTMLDialogElement>(null);
     const input = useRef<HTMLInputElement>(null);
-
-    // useEffect(() => {
-    //     if (input.current && isConnected) {
-    //         let url = location.
-    //     }
-    // })
 
     if (visibility) {
         if (dialog.current && !dialog.current.open) {
@@ -62,6 +57,22 @@ export default function SessionInterface({visibility, changeVisibility, connectT
         }
     }
 
+    function getUrl() {
+        let url = new URL(window.location.href);
+        return url.toString();
+    }
+
+    function resetUrl() {
+        let url = new URL(window.location.href);
+        url.searchParams.delete("room");
+        history.pushState({}, "", url);
+    }
+
+    function disconnect() {
+        disconnectFromSession();
+        resetUrl();
+    }
+
     return (
     <div className={`${styles.container}`}>
         <dialog
@@ -71,21 +82,32 @@ export default function SessionInterface({visibility, changeVisibility, connectT
                 isInsideBounds(event);
             }}
         >   
-            {/* should only appear when session is started */}
             <div className={`${styles.inputContainer}`}>
-                <input type="text" placeholder = "link with room id" id = "roomId" readOnly = {true} ref={input}></input>
+                <input type="text" value = {room != null? getUrl() : "" } placeholder = "link with room id" id = "roomId" readOnly = {true} ref={input}></input>
                 <button className={`${styles.clipboardButton}`} onClick={()=>copyToClipBoard()}>Copy link</button>
             </div>
 
-            <button className={`${styles.sessionButton}`}
-            onClick={()=> {
-                if (!isConnected) {
-                    handleConnection()
-                    }    
-                }
-            }
-            > Start session</button>
-                
+            <div className={`${styles.sessionButtonContainer}`}>
+
+                <button className={`${styles.sessionButton}`}
+                    onClick={()=> {
+                        if (!isConnected) {
+                            handleConnection()
+                            }    
+                        }
+                    }
+                > Start session</button>
+
+                <button className={`${styles.sessionButton}`}
+                    onClick={()=> {
+                        if (isConnected) {
+                            disconnect()
+                            }    
+                        }
+                    }
+                > Disconnect</button>
+            </div>
+
             <button className={`${styles.closeButton}`}
             
                 onClick={() => {

@@ -33,7 +33,7 @@ dialog::backdrop {
   position: absolute;
   right: 0;
   top: 0;
-  height: 5%;
+  height: 10%;
   width: 5%;
   background-color: transparent;
   background-image: url('../../../public/closeIcon.svg');
@@ -48,13 +48,9 @@ dialog::backdrop {
 
 
 .sessionButton {
-  position: absolute;
   background-color: rgb(185, 160, 224);
-  bottom: 0;
-  left : 50%;
-  -ms-transform: translateX(-50%);
-  transform: translateX(-50%);
   color: rgb(36, 33, 39);
+  margin : 2px;
 }
 
 .clipboardButton {
@@ -66,6 +62,16 @@ dialog::backdrop {
 input {
   flex: 3 1 0;
   outline:none;
+}
+
+.sessionButtonContainer {
+  display:flex;
+  flex-direction: row;
+  position: absolute;
+  bottom: 0;
+  left : 50%;
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
 }
 
 input:focus {
