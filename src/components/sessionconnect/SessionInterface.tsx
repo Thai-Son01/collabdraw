@@ -1,17 +1,24 @@
-import { useRef} from 'react';
+import { useEffect, useRef} from 'react';
 import styles from './SessionInterface.module.css'
 import {Client} from '@stomp/stompjs'
 import connectToWebSocket from '../../websocket';
 
-export default function SessionInterface({visibility, changeVisibility, connectToSession, isConnected} : 
+export default function SessionInterface({visibility, changeVisibility, connectToSession, isConnected, room} : 
                                         {visibility : boolean,
                                         changeVisibility : (value : boolean) => void,
                                         connectToSession : (client : Client ,roomId: string) => void,
                                         isConnected : boolean,
+                                        room: string | null,
                                         }) {
 
     const dialog = useRef<HTMLDialogElement>(null);
     const input = useRef<HTMLInputElement>(null);
+
+    // useEffect(() => {
+    //     if (input.current && isConnected) {
+    //         let url = location.
+    //     }
+    // })
 
     if (visibility) {
         if (dialog.current && !dialog.current.open) {
@@ -46,8 +53,10 @@ export default function SessionInterface({visibility, changeVisibility, connectT
                 let url = new URL(window.location.href);
                 url.searchParams.set("room", roomId);
 
-                input.current.value = url.toString();           
+                input.current.value = url.toString();
+                history.pushState({}, "", url);
                 let websocketClient = connectToWebSocket("test_user_id", roomId);
+                
                 connectToSession(websocketClient, roomId);
             }
         }

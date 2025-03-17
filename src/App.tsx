@@ -102,6 +102,7 @@ function setModal(visibility : boolean) {
       visibility = {popupVisibility}
       connectToSession = {connect}
       isConnected = {isConnected}
+      room = {roomIdentifier !== null? roomIdentifier : null}
       >
       </SessionInterface>
 
