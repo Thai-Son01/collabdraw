@@ -1,17 +1,18 @@
 import { useRef} from 'react';
 import styles from './SessionInterface.module.css'
+import {Client} from '@stomp/stompjs'
+import connectToWebSocket from '../../websocket';
 
 export default function SessionInterface({visibility, changeVisibility, connectToSession, isConnected} : 
                                         {visibility : boolean,
                                         changeVisibility : (value : boolean) => void,
-                                        connectToSession : (roomId: string) => void,
+                                        connectToSession : (client : Client ,roomId: string) => void,
                                         isConnected : boolean,
                                         }) {
 
     const dialog = useRef<HTMLDialogElement>(null);
     const input = useRef<HTMLInputElement>(null);
 
-    console.log(isConnected);
     if (visibility) {
         if (dialog.current && !dialog.current.open) {
             dialog.current.showModal();
@@ -40,10 +41,15 @@ export default function SessionInterface({visibility, changeVisibility, connectT
     function handleConnection() {
         if (!isConnected) {
             const roomId = crypto.randomUUID();
-            if (input.current) {
-                input.current.value = roomId;           
+            if (input.current && !input.current.value) {
+
+                let url = new URL(window.location.href);
+                url.searchParams.set("room", roomId);
+
+                input.current.value = url.toString();           
+                let websocketClient = connectToWebSocket("test_user_id", roomId);
+                connectToSession(websocketClient, roomId);
             }
-            connectToSession(roomId);
         }
     }
 
@@ -58,22 +64,15 @@ export default function SessionInterface({visibility, changeVisibility, connectT
         >   
             {/* should only appear when session is started */}
             <div className={`${styles.inputContainer}`}>
-                <input type="text" value = "link with room id" id = "roomId" readOnly = {true} ref={input}></input>
+                <input type="text" placeholder = "link with room id" id = "roomId" readOnly = {true} ref={input}></input>
                 <button className={`${styles.clipboardButton}`} onClick={()=>copyToClipBoard()}>Copy link</button>
             </div>
+
             <button className={`${styles.sessionButton}`}
             onClick={()=> {
                 if (!isConnected) {
-                    const roomId = crypto.randomUUID();
-                    if (input.current) {
-                        input.current.value = roomId;           
-                    }
-                    connectToSession(roomId);
-                }
-                // if (!isConnected) {
-                //     handleConnection()
-                //     }    
-                // }
+                    handleConnection()
+                    }    
                 }
             }
             > Start session</button>

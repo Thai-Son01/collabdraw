@@ -1,61 +1,60 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect} from 'react'
 import './App.css'
 import DrawingCanvas from './components/drawingcanvas/DrawingCanvas'
 import Chat from './components/chat/Chat'
 import ToolBar from './components/toolbar/ToolBar'
 import {Client} from '@stomp/stompjs'
-import useWebsocketConnection from './websocket'
-import throttle from 'lodash.throttle'
 import SessionInterface from './components/sessionconnect/SessionInterface'
 import { tool } from './interface'
+import connectToWebSocket from './websocket'
 
 function App() {
 
-const WS_URL = "ws://localhost:8080/gs-guide-websocket";
-// const roomIdentifier = useRef("1");
-// const userIdentifier = useRef(crypto.randomUUID());
 const [isConnected, setIsConnected] = useState(false);
 const [connection, setConnection] = useState<Client | null>(null);
 const [roomIdentifier, setRoomIdenfitier] = useState<string | null>(null);
 
 //ce truc pourrait meme etre dans un autre fichier je pense
 const defaultPen  : tool= {
-  "tool" : "pen",
-  "width" : 10,
-  "opacity" : 100,
-  "colour" : [209, 202, 219]
+  tool : "pen",
+  width : 10,
+  opacity : 100,
+  colour : [209, 202, 219]
 }
 
 const defaultEraser : tool = {
-  "tool" : "eraser",
-  "width" : 10,
-  "opacity" : 100,
+  tool : "eraser",
+  width : 10,
+  opacity : 100,
 
 }
 const inventory = {
-  "pen" : defaultPen,
-  "eraser" : defaultEraser
+  pen : defaultPen,
+  eraser : defaultEraser
 }
 
 const [toolInventory, setToolInventory] = useState(inventory);
 const [popupVisibility, setPopupVisibility] = useState(false);
 const [itemSelected, setItemSelected] = useState("pen"); //id of selected tool
-
 //no idea if useridentifier necessary parce que cest le backend qui cree un id
-// const connection = useWebsocketConnection(userIdentifier.current,
-//                                           roomIdentifier.current, WS_URL) as Client; //random cast sinon ca chiale
 
 
-const connect = (roomId : string) => {
+useEffect(() => {
+  const currentUrl = new URL(window.location.href);
+  const room = currentUrl.searchParams.get("room");
+  if (room) {
+    console.log(room);
+    let websocketClient = connectToWebSocket("test_user_id", room); //where do i put the url man
+    connect(websocketClient, room);
+  }
+}, [])
+
+const connect = (client : Client, roomId : string) => {
   console.log("connect is called");
-  //this part breaks because it doesnt like that
-  // const connection = useWebsocketConnection("testing",
-  //                                           roomId, 
-  //                                           WS_URL) as Client; //random cast sinon ca chiale
-  console.log("after connect");
-  setConnection(connection);
+  setConnection(client);
   setRoomIdenfitier(roomId);
   setIsConnected(true);
+  console.log("after connect");
 }
 
 function modifyValue(toolType : string, property : string, value : number | string) {
