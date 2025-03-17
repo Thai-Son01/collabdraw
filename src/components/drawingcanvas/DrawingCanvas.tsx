@@ -56,19 +56,29 @@ export default function DrawingCanvas({selectedTool, connection, room} :
                 ctx.lineCap = "round";
                 displayCtxRef.current = ctx;
         }
-        if (!connection?.connected) {
-            console.log("why does it return null lol");
-        }
-        else {
-            console.log("IL Y A UNE CONNEXION WHAT THE FUCK MAN");
-            console.log(connection.connected);
+
+
+        if (connection?.connected) {
             connection.subscribe(`/user/queue/${room}`, message => {
                 console.log("THIS SHOULD WORK CMON MAN")
                 console.log(message);
             })
 
-
         }
+
+        // if (!connection?.connected) {
+        //     console.log("why does it return null lol");
+        // }
+        // else {
+        //     console.log("IL Y A UNE CONNEXION WHAT THE FUCK MAN");
+        //     console.log(connection.connected);
+        //     connection.subscribe(`/user/queue/${room}`, message => {
+        //         console.log("THIS SHOULD WORK CMON MAN")
+        //         console.log(message);
+        //     })
+
+
+        // }
 
         }, [connection?.connected])
 
