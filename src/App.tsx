@@ -62,13 +62,6 @@ function connect(client : Client, roomId : string) {
   console.log(client.connected);
 }
 
-function subscribeToEvent(path : string, handler : any ) {
-  if (connection) {
-    connection.subscribe(path,handler);
-  }
-}
-
-
 function disconnect() {
 
   if (connection) {
@@ -117,7 +110,6 @@ function setModal(visibility : boolean) {
       connection = {connection !== null ? connection : null}
       selectedTool= {toolInventory[itemSelected]} //underlined red mais ca a l'air de marcher
       room = {roomIdentifier !== null? roomIdentifier : null}
-      subscribe = {subscribeToEvent}
       ></DrawingCanvas>
       
       <Chat></Chat>

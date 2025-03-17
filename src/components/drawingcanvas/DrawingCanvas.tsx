@@ -3,12 +3,11 @@ import styles from './DrawingCanvas.module.css'
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { tool } from '../../interface';
 
-export default function DrawingCanvas({selectedTool, connection, room, subscribe} : 
+export default function DrawingCanvas({selectedTool, connection, room} : 
                                     {
                                     selectedTool : tool, //trop paresseux de changer type pour l'instant
                                     connection : Client | null,
                                     room : string | null,
-                                    subscribe : (path : string, handler : any) => void
                                     }){
 
     
