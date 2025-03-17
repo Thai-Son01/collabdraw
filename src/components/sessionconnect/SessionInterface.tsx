@@ -1,4 +1,4 @@
-import { useEffect, useRef} from 'react';
+import {useRef} from 'react';
 import styles from './SessionInterface.module.css'
 import {Client} from '@stomp/stompjs'
 import connectToWebSocket from '../../websocket';

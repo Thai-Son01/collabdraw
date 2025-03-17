@@ -15,10 +15,10 @@ export default function connectToWebSocket(userId : string, room : string, serve
 
         onStompError : (frame) => {
             console.log("wtf is happenign man", frame);
-            },
+        },
             
         onWebSocketError: (error) => {
-        console.log("websocket error", error);
+            console.log("websocket error", error);
         },
 
         onConnect: () => {
@@ -29,7 +29,7 @@ export default function connectToWebSocket(userId : string, room : string, serve
             });
 
 
-            console.log(client.connected);
+            // console.log(client.connected);
 
             // client.publish({destination : "/app/hello",
             // body: JSON.stringify({'name': userId})
@@ -39,10 +39,10 @@ export default function connectToWebSocket(userId : string, room : string, serve
                         });
 
             // console.log(`/user/${userId}/queue/${room}`);
-            client.subscribe(`/user/queue/${room}`, message => {
-                console.log("THIS SHOULD WORK CMON MAN")
-                console.log(message);
-            })
+            // client.subscribe(`/user/queue/${room}`, message => {
+            //     console.log("THIS SHOULD WORK CMON MAN")
+            //     console.log(message);
+            // })
 
             console.log("connected to server through websocket");
 

@@ -3,11 +3,12 @@ import styles from './DrawingCanvas.module.css'
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { tool } from '../../interface';
 
-export default function DrawingCanvas({selectedTool, connection, room} : 
+export default function DrawingCanvas({selectedTool, connection, room, subscribe} : 
                                     {
                                     selectedTool : tool, //trop paresseux de changer type pour l'instant
                                     connection : Client | null,
-                                    room : string | null
+                                    room : string | null,
+                                    subscribe : (path : string, handler : any) => void
                                     }){
 
     
@@ -17,9 +18,18 @@ export default function DrawingCanvas({selectedTool, connection, room} :
     const displayCtxRef = useRef<CanvasRenderingContext2D>(null);
     const [drawingPath, setDrawingPath] = useState<Array<Array<number>>>([]);
     const [isDrawing, setIsDrawing] = useState(false);
-    
-    useEffect(() => {   
 
+    function sendData() {
+        if (connection) {
+            connection.publish({destination : `/app/coordinates/${room}`,
+                body: JSON.stringify({"x" : 1,
+                                      "y" : 1,
+                                        })
+                });
+        }
+    }
+    useEffect(() => {   
+        console.log("USE EFFECT IN DRAWING CANVAS IS CALLED");
         //les height et width ne changent jamais? si on change de taille le viewport 
         if(drawingCanvasRef.current){
             drawingCanvasRef.current.width = window.innerWidth;
@@ -47,8 +57,21 @@ export default function DrawingCanvas({selectedTool, connection, room} :
                 ctx.lineCap = "round";
                 displayCtxRef.current = ctx;
         }
+        if (!connection?.connected) {
+            console.log("why does it return null lol");
+        }
+        else {
+            console.log("IL Y A UNE CONNEXION WHAT THE FUCK MAN");
+            console.log(connection.connected);
+            connection.subscribe(`/user/queue/${room}`, message => {
+                console.log("THIS SHOULD WORK CMON MAN")
+                console.log(message);
+            })
 
-        }, [])
+
+        }
+
+        }, [connection?.connected])
 
 
     function addPositionToPath(position : Array<number>) {
@@ -159,7 +182,8 @@ export default function DrawingCanvas({selectedTool, connection, room} :
                 if (drawingCtxRef.current && drawingCanvasRef.current && isDrawing) {
 
                     let [currentX, currentY] = getMousePosition(drawingCanvasRef.current, e);
-                    draw(currentX, currentY, selectedTool.tool);   
+                    draw(currentX, currentY, selectedTool.tool);
+                    sendData();
                 }
 
 
