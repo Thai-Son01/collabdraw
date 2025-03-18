@@ -1,7 +1,7 @@
-import { Client } from '@stomp/stompjs';
+import { Client, IMessage } from '@stomp/stompjs';
 import styles from './DrawingCanvas.module.css'
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { tool } from '../../interface';
+import React, { useState, useEffect, useRef } from "react";
+import { drawData, PenStatus, point, tool } from '../../interface';
 
 export default function DrawingCanvas({selectedTool, connection, room} : 
                                     {
@@ -15,20 +15,13 @@ export default function DrawingCanvas({selectedTool, connection, room} :
     const drawingCtxRef = useRef<CanvasRenderingContext2D>(null);
     const displayCanvasRef = useRef<HTMLCanvasElement>(null);
     const displayCtxRef = useRef<CanvasRenderingContext2D>(null);
+    const syncCanvasRef = useRef<HTMLCanvasElement>(null);
+    const syncCanvasCtxRef = useRef<CanvasRenderingContext2D>(null);
     const [drawingPath, setDrawingPath] = useState<Array<Array<number>>>([]);
     const [isDrawing, setIsDrawing] = useState(false);
 
-    function sendData() {
-        if (connection) {
-            connection.publish({destination : `/app/coordinates/${room}`,
-                body: JSON.stringify({"x" : 1,
-                                      "y" : 1,
-                                        })
-                });
-        }
-    }
-
     useEffect(() => {
+        //getting called multiple times a cause du websocket connection alors ca peut briser le canvas xddd
         console.log("USE EFFECT IN DRAWING CANVAS IS CALLED");
         //les height et width ne changent jamais? si on change de taille le viewport 
         if(drawingCanvasRef.current){
@@ -37,7 +30,7 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             const ctx = drawingCanvasRef.current.getContext("2d");
             
             if (ctx){
-                //when page hot reloads and eraser was picked, crashes the website because there is no colour
+
                 ctx.lineCap = "round";
                 if (selectedTool.colour)
                     ctx.strokeStyle = `rgba(${selectedTool.colour[0]}  
@@ -58,31 +51,44 @@ export default function DrawingCanvas({selectedTool, connection, room} :
                 displayCtxRef.current = ctx;
         }
 
+        if(syncCanvasRef.current){
+            syncCanvasRef.current.width = window.innerWidth;
+            syncCanvasRef.current.height = window.innerHeight;
+            const ctx = syncCanvasRef.current.getContext("2d");
+            
+            if (ctx){
+
+                ctx.lineCap = "round";
+                if (selectedTool.colour)
+                    ctx.strokeStyle = `rgba(${selectedTool.colour[0]}  
+                                          ${selectedTool.colour[1]} 
+                                          ${selectedTool.colour[2]} / 
+                                          ${selectedTool.opacity}%)`
+                syncCanvasCtxRef.current = ctx;
+            }
+        }
 
         if (connection?.connected) {
             connection.subscribe(`/user/queue/${room}`, message => {
-                console.log("THIS SHOULD WORK CMON MAN")
-                console.log(message.body);
+                handleSync(message);
             })
-
         }
 
-        // if (!connection?.connected) {
-        //     console.log("why does it return null lol");
-        // }
-        // else {
-        //     console.log("IL Y A UNE CONNEXION WHAT THE FUCK MAN");
-        //     console.log(connection.connected);
-        //     connection.subscribe(`/user/queue/${room}`, message => {
-        //         console.log("THIS SHOULD WORK CMON MAN")
-        //         console.log(message);
-        //     })
+    }, [connection?.connected])
 
 
-        // }
+    function handleSync(message : IMessage) {
+        console.log("THIS SHOULD WORK CMON MAN")
+        console.log(message.body);
+    }
 
-        }, [connection?.connected])
-
+    function sendData(drawData : drawData ) {
+        if (connection) {
+            connection.publish({destination : `/app/coordinates/${room}`,
+                body: JSON.stringify(drawData)
+                });
+        }
+    }
 
     function addPositionToPath(position : Array<number>) {
         let newPath = structuredClone(drawingPath);
@@ -126,7 +132,6 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             case "eraser" : {
                 if (displayCtxRef.current && displayCanvasRef.current) {
                     context = displayCtxRef.current;
-                    // context.strokeStyle = "rgba(0 0 0 / 10%)";
                     context.globalCompositeOperation = "destination-out";
                     context.beginPath(); // xd this function too big does too many things man
                 }
@@ -137,7 +142,10 @@ export default function DrawingCanvas({selectedTool, connection, room} :
         context!.lineWidth = selectedTool.width;
             //casting xdddd
         let [startX, startY] = getMousePosition(drawingCanvasRef.current as HTMLCanvasElement, e); //maybe should just give the right canvas here or better yet do we even need to change the canvas here
+        let point : point = {x : startX, y : startY};
+        let drawData : drawData = {tool : selectedTool, point : point, status : PenStatus.START};
         draw(startX, startY, selectedTool.tool );
+        sendData(drawData);
     }
 
 
@@ -172,11 +180,19 @@ export default function DrawingCanvas({selectedTool, connection, room} :
 
     return (
     <div>
+        {/* SYNCING WITH BACKEND WHEN IN ROOM CANVAS */}
+        <canvas
+            ref={syncCanvasRef}
+            className={`${styles.bottomCanvas}`}>
+        </canvas>
+
+        {/* REAL DISPLAY CANVAS */}
         <canvas
             ref={displayCanvasRef}
             className={`${styles.bottomCanvas}`}>
         </canvas>
-
+        
+        {/* THE CANVAS WE DRAW ON */}
         <canvas
             className ={`${styles.drawingCanvas}`}
             onMouseDown={(e : React.MouseEvent)=> {
@@ -192,8 +208,10 @@ export default function DrawingCanvas({selectedTool, connection, room} :
                 if (drawingCtxRef.current && drawingCanvasRef.current && isDrawing) {
 
                     let [currentX, currentY] = getMousePosition(drawingCanvasRef.current, e);
+                    let point : point = {x : currentX, y : currentY};
+                    let drawData : drawData = {tool : selectedTool, point : point, status : PenStatus.MOVING};
                     draw(currentX, currentY, selectedTool.tool);
-                    sendData();
+                    sendData(drawData);
                 }
 
 
@@ -206,6 +224,9 @@ export default function DrawingCanvas({selectedTool, connection, room} :
                     displayCtxRef.current.drawImage(drawingCanvasRef.current, 0,0);
                     drawingCtxRef.current.clearRect(0, 0, drawingCanvasRef.current.width, drawingCanvasRef.current.height);
                     resetPath();
+                    let point : point = {x : 0, y : 0};
+                    let drawData : drawData = {tool : selectedTool, point : point, status : PenStatus.LIFTED};
+                    sendData(drawData);
                 }
             }}
 

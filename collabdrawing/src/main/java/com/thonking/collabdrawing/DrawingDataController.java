@@ -4,20 +4,15 @@ package com.thonking.collabdrawing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.messaging.simp.user.SimpUser;
-import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.util.HtmlUtils;
 
 import java.security.Principal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Controller
-public class CoordinateController {
+public class DrawingDataController {
 
     @Autowired
     private RoomManager manager;
@@ -26,9 +21,9 @@ public class CoordinateController {
     private SimpMessagingTemplate messageSender;
 
     @MessageMapping("/coordinates/{roomId}")
-    public void relayCoordinates(@DestinationVariable String roomId, Coordinates coordinate, StompHeaderAccessor headers) throws Exception {
-
-        send(coordinate, headers);
+    public void relayCoordinates(@DestinationVariable String roomId, DrawingData data, StompHeaderAccessor headers) throws Exception {
+        System.out.println(data.toString());
+        send(data, headers);
 
     }
 
