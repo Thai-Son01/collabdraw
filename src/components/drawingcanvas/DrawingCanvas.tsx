@@ -27,7 +27,8 @@ export default function DrawingCanvas({selectedTool, connection, room} :
                 });
         }
     }
-    useEffect(() => {   
+
+    useEffect(() => {
         console.log("USE EFFECT IN DRAWING CANVAS IS CALLED");
         //les height et width ne changent jamais? si on change de taille le viewport 
         if(drawingCanvasRef.current){
@@ -61,7 +62,7 @@ export default function DrawingCanvas({selectedTool, connection, room} :
         if (connection?.connected) {
             connection.subscribe(`/user/queue/${room}`, message => {
                 console.log("THIS SHOULD WORK CMON MAN")
-                console.log(message);
+                console.log(message.body);
             })
 
         }

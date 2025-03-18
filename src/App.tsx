@@ -59,7 +59,6 @@ function connect(client : Client, roomId : string) {
   setRoomIdenfitier(roomId);
   setIsConnected(true);
   console.log("after connect");
-  console.log(client.connected);
 }
 
 function disconnect() {
