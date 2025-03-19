@@ -13,46 +13,30 @@ export default function DrawingCanvas({selectedTool, connection, room} :
     
     const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
     const drawingCtxRef = useRef<CanvasRenderingContext2D>(null);
+    
     const displayCanvasRef = useRef<HTMLCanvasElement>(null);
     const displayCtxRef = useRef<CanvasRenderingContext2D>(null);
+
     const syncCanvasRef = useRef<HTMLCanvasElement>(null);
     const syncCanvasCtxRef = useRef<CanvasRenderingContext2D>(null);
+
     const [drawingPath, setDrawingPath] = useState<Array<Array<number>>>([]);
     const [isDrawing, setIsDrawing] = useState(false);
 
     useEffect(() => {
         console.log("USE EFFECT IN DRAWING CANVAS IS CALLED");
         //les height et width ne changent jamais? si on change de taille le viewport 
-        if(drawingCanvasRef.current){
-            drawingCanvasRef.current.width = window.innerWidth;
-            drawingCanvasRef.current.height = window.innerHeight;
-            const ctx = drawingCanvasRef.current.getContext("2d");
-            
-            if (ctx){
-                setupCanvas(ctx, selectedTool);
-                drawingCtxRef.current = ctx;
-            }
+        if(drawingCanvasRef.current) {
+
+            setContext(drawingCanvasRef.current, drawingCtxRef, selectedTool);
         }
 
         if(displayCanvasRef.current) {
-            displayCanvasRef.current.width = window.innerWidth;
-            displayCanvasRef.current.height = window.innerHeight;
-
-            const ctx = displayCanvasRef.current.getContext("2d");
-            if (ctx)
-                setupCanvas(ctx, selectedTool);
-                displayCtxRef.current = ctx;
+            setContext(displayCanvasRef.current, displayCtxRef, selectedTool);
         }
 
-        if(syncCanvasRef.current){
-            syncCanvasRef.current.width = window.innerWidth;
-            syncCanvasRef.current.height = window.innerHeight;
-            const ctx = syncCanvasRef.current.getContext("2d");
-            
-            if (ctx){
-                setupCanvas(ctx, selectedTool);
-                syncCanvasCtxRef.current = ctx;
-            }
+        if(syncCanvasRef.current) {
+            setContext(syncCanvasRef.current, syncCanvasCtxRef, selectedTool);
         }
         
     }, []);
@@ -66,6 +50,17 @@ export default function DrawingCanvas({selectedTool, connection, room} :
         }
         
     }, [connection?.connected]);
+
+    function setContext(canvas: HTMLCanvasElement, contextRef: React.RefObject<CanvasRenderingContext2D | null>, tool: tool) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const ctx = canvas.getContext("2d");
+        console.log("will setup canvas");
+        if (ctx) {
+            setupCanvas(ctx, tool);
+            contextRef.current = ctx; // This updates the ref correctly
+        }
+    }
 
     function setupCanvas(context : CanvasRenderingContext2D, tool : tool) {
         context.lineCap = "round";
@@ -94,12 +89,6 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             if (status !== PenStatus.LIFTED) {
                 if (tool.tool === "pen") {
                     setupCanvas(syncCanvasCtxRef.current, tool);
-                    // syncCanvasCtxRef.current.strokeStyle = `rgba(${tool.colour![0]}  
-                    //                                         ${tool.colour![1]} 
-                    //                                         ${tool.colour![2]} / 
-                    //                                         ${tool.opacity!}%)`;
-                    // syncCanvasCtxRef.current.lineWidth = tool.width;
-                    // syncCanvasCtxRef.current.globalCompositeOperation = "source-over";
                 }
             }
         }
@@ -155,7 +144,7 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             }
             default : break;
         }
-        
+
         //casting xdddd
         let [startX, startY] = getMousePosition(drawingCanvasRef.current as HTMLCanvasElement, e); //maybe should just give the right canvas here or better yet do we even need to change the canvas here
         let point : point = {x : startX, y : startY};
