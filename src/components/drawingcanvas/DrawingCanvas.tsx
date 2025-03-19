@@ -67,15 +67,18 @@ export default function DrawingCanvas({selectedTool, connection, room} :
                 syncCanvasCtxRef.current = ctx;
             }
         }
-
+        
+    }, []) //this gets called when creating a connection, so canvas gets cleared. need to fix that.
+    
+    useEffect(() => {
+    
         if (connection?.connected) {
             connection.subscribe(`/user/queue/${room}`, message => {
                 handleSync(message);
             })
         }
-
+        
     }, [connection?.connected])
-
 
     function handleSync(message : IMessage) {
         console.log("THIS SHOULD WORK CMON MAN")
