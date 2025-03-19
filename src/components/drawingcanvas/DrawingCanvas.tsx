@@ -5,7 +5,7 @@ import { drawData, PenStatus, point, tool } from '../../interface';
 
 export default function DrawingCanvas({selectedTool, connection, room} : 
                                     {
-                                    selectedTool : tool, //trop paresseux de changer type pour l'instant
+                                    selectedTool : tool,
                                     connection : Client | null,
                                     room : string | null,
                                     }){
@@ -21,7 +21,6 @@ export default function DrawingCanvas({selectedTool, connection, room} :
     const [isDrawing, setIsDrawing] = useState(false);
 
     useEffect(() => {
-        //getting called multiple times a cause du websocket connection alors ca peut briser le canvas xddd
         console.log("USE EFFECT IN DRAWING CANVAS IS CALLED");
         //les height et width ne changent jamais? si on change de taille le viewport 
         if(drawingCanvasRef.current){
@@ -30,13 +29,13 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             const ctx = drawingCanvasRef.current.getContext("2d");
             
             if (ctx){
-
-                ctx.lineCap = "round";
-                if (selectedTool.colour)
-                    ctx.strokeStyle = `rgba(${selectedTool.colour[0]}  
-                                          ${selectedTool.colour[1]} 
-                                          ${selectedTool.colour[2]} / 
-                                          ${selectedTool.opacity}%)`
+                setupCanvas(ctx, selectedTool);
+                // ctx.lineCap = "round";
+                // if (selectedTool.colour)
+                //     ctx.strokeStyle = `rgba(${selectedTool.colour[0]}  
+                //                           ${selectedTool.colour[1]} 
+                //                           ${selectedTool.colour[2]} / 
+                //                           ${selectedTool.opacity}%)`
                 drawingCtxRef.current = ctx;
             }
         }
@@ -47,7 +46,8 @@ export default function DrawingCanvas({selectedTool, connection, room} :
 
             const ctx = displayCanvasRef.current.getContext("2d");
             if (ctx)
-                ctx.lineCap = "round";
+                setupCanvas(ctx, selectedTool);
+                // ctx.lineCap = "round";
                 displayCtxRef.current = ctx;
         }
 
@@ -57,18 +57,18 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             const ctx = syncCanvasRef.current.getContext("2d");
             
             if (ctx){
-
-                ctx.lineCap = "round";
-                if (selectedTool.colour)
-                    ctx.strokeStyle = `rgba(${selectedTool.colour[0]}  
-                                          ${selectedTool.colour[1]} 
-                                          ${selectedTool.colour[2]} / 
-                                          ${selectedTool.opacity}%)`
+                setupCanvas(ctx, selectedTool);
+                // ctx.lineCap = "round";
+                // if (selectedTool.colour)
+                //     ctx.strokeStyle = `rgba(${selectedTool.colour[0]}  
+                //                           ${selectedTool.colour[1]} 
+                //                           ${selectedTool.colour[2]} / 
+                //                           ${selectedTool.opacity}%)`
                 syncCanvasCtxRef.current = ctx;
             }
         }
         
-    }, []) //this gets called when creating a connection, so canvas gets cleared. need to fix that.
+    }, []);
     
     useEffect(() => {
     
@@ -78,11 +78,43 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             })
         }
         
-    }, [connection?.connected])
+    }, [connection?.connected]);
 
+    function setupCanvas(context : CanvasRenderingContext2D, tool : tool) {
+        context.lineCap = "round";
+        context.lineWidth = tool.width;
+        if (tool.colour) {
+            context.strokeStyle = `rgba(${tool.colour[0]}  
+                                  ${tool.colour[1]} 
+                                  ${tool.colour[2]} / 
+                                  ${tool.opacity}%)`;
+            context.globalCompositeOperation = "source-over";
+        }
+        else {
+            context.globalCompositeOperation = "destination-out";
+        }
+
+    }
     function handleSync(message : IMessage) {
-        console.log("THIS SHOULD WORK CMON MAN")
-        console.log(message.body);
+        let syncData : drawData = JSON.parse(message.body);
+        console.log(syncData);
+
+        if (syncCanvasCtxRef.current) {
+            let tool : tool = syncData.tool;
+            let point : point = syncData.point;
+            let status : PenStatus = syncData.status;
+            
+            if (status !== PenStatus.LIFTED) {
+                if (tool.tool === "pen") {
+                    syncCanvasCtxRef.current.strokeStyle = `rgba(${tool.colour![0]}  
+                                                            ${tool.colour![1]} 
+                                                            ${tool.colour![2]} / 
+                                                            ${tool.opacity!}%)`;
+                    syncCanvasCtxRef.current.lineWidth = tool.width;
+                    syncCanvasCtxRef.current.globalCompositeOperation = "source-over";
+                }
+            }
+        }
     }
 
     function sendData(drawData : drawData ) {
@@ -199,7 +231,7 @@ export default function DrawingCanvas({selectedTool, connection, room} :
         <canvas
             className ={`${styles.drawingCanvas}`}
             onMouseDown={(e : React.MouseEvent)=> {
-                if (!isDrawing && drawingCanvasRef.current) {
+                if (!isDrawing && drawingCanvasRef.current && e.button === 0) {
                     
                     setIsDrawing(true);
                     setupTool(e);

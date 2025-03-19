@@ -42,7 +42,7 @@ const [itemSelected, setItemSelected] = useState("pen"); //id of selected tool
 useEffect(() => {
   const currentUrl = new URL(window.location.href);
   const room = currentUrl.searchParams.get("room");
-  if (room) {
+  if (room && !isConnected) {
     console.log(room);
     let websocketClient = connectToWebSocket("test_user_id", room); //where do i put the url man
     connect(websocketClient, room);
