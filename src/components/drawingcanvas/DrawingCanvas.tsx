@@ -30,12 +30,6 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             
             if (ctx){
                 setupCanvas(ctx, selectedTool);
-                // ctx.lineCap = "round";
-                // if (selectedTool.colour)
-                //     ctx.strokeStyle = `rgba(${selectedTool.colour[0]}  
-                //                           ${selectedTool.colour[1]} 
-                //                           ${selectedTool.colour[2]} / 
-                //                           ${selectedTool.opacity}%)`
                 drawingCtxRef.current = ctx;
             }
         }
@@ -47,7 +41,6 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             const ctx = displayCanvasRef.current.getContext("2d");
             if (ctx)
                 setupCanvas(ctx, selectedTool);
-                // ctx.lineCap = "round";
                 displayCtxRef.current = ctx;
         }
 
@@ -58,12 +51,6 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             
             if (ctx){
                 setupCanvas(ctx, selectedTool);
-                // ctx.lineCap = "round";
-                // if (selectedTool.colour)
-                //     ctx.strokeStyle = `rgba(${selectedTool.colour[0]}  
-                //                           ${selectedTool.colour[1]} 
-                //                           ${selectedTool.colour[2]} / 
-                //                           ${selectedTool.opacity}%)`
                 syncCanvasCtxRef.current = ctx;
             }
         }
@@ -106,12 +93,13 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             
             if (status !== PenStatus.LIFTED) {
                 if (tool.tool === "pen") {
-                    syncCanvasCtxRef.current.strokeStyle = `rgba(${tool.colour![0]}  
-                                                            ${tool.colour![1]} 
-                                                            ${tool.colour![2]} / 
-                                                            ${tool.opacity!}%)`;
-                    syncCanvasCtxRef.current.lineWidth = tool.width;
-                    syncCanvasCtxRef.current.globalCompositeOperation = "source-over";
+                    setupCanvas(syncCanvasCtxRef.current, tool);
+                    // syncCanvasCtxRef.current.strokeStyle = `rgba(${tool.colour![0]}  
+                    //                                         ${tool.colour![1]} 
+                    //                                         ${tool.colour![2]} / 
+                    //                                         ${tool.opacity!}%)`;
+                    // syncCanvasCtxRef.current.lineWidth = tool.width;
+                    // syncCanvasCtxRef.current.globalCompositeOperation = "source-over";
                 }
             }
         }
@@ -148,34 +136,27 @@ export default function DrawingCanvas({selectedTool, connection, room} :
 
     //i hate it
     function setupTool(e : React.MouseEvent) {
-        let context;
         switch(selectedTool.tool) {
             case "pen" : {
                 if (drawingCtxRef.current) {
-                    context = drawingCtxRef.current;
-                    context.globalCompositeOperation = "source-over";
+                    setupCanvas(drawingCtxRef.current, selectedTool);
                     displayCtxRef.current!.globalCompositeOperation = "source-over"; //!!
-                    if(selectedTool.colour)
-                        context.strokeStyle = `rgba(${selectedTool.colour[0]}  
-                                                    ${selectedTool.colour[1]} 
-                                                    ${selectedTool.colour[2]} / 
-                                                    ${selectedTool.opacity}%)`
                 }
                 break;
             }
+
             //same problem with eraser when opacity XDDDDD bro do i even want opacity for this then
             case "eraser" : {
                 if (displayCtxRef.current && displayCanvasRef.current) {
-                    context = displayCtxRef.current;
-                    context.globalCompositeOperation = "destination-out";
-                    context.beginPath(); // xd this function too big does too many things man
+                    setupCanvas(displayCtxRef.current, selectedTool)
+                    displayCtxRef.current.beginPath(); // xd this function too big does too many things man
                 }
                 break;
             }
             default : break;
         }
-        context!.lineWidth = selectedTool.width;
-            //casting xdddd
+        
+        //casting xdddd
         let [startX, startY] = getMousePosition(drawingCanvasRef.current as HTMLCanvasElement, e); //maybe should just give the right canvas here or better yet do we even need to change the canvas here
         let point : point = {x : startX, y : startY};
         let drawData : drawData = {tool : selectedTool, point : point, status : PenStatus.START};
