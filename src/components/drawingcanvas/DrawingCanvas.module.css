@@ -17,11 +17,12 @@
   left:0;
   margin: 0;
   padding: 0;
-  background-color: rgb(16, 13, 20);
+  background-color: transparent;
   height: 100vh;
   width: 100vw;
 }
 
-div {
+.canvasBackground {
   position : relative;
+  background-color: rgb(16, 13, 20);
 }
