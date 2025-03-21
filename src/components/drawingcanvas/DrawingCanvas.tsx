@@ -23,7 +23,9 @@ export default function DrawingCanvas({selectedTool, connection, room} :
     const otherSyncCanvasRef = useRef<HTMLCanvasElement>(null);
     const otherSyncCanvasCtxRef = useRef<CanvasRenderingContext2D>(null);
 
-    const [syncDrawingPath, setSyncDrawingPath] = useState<Array<Array<number>>>([]);
+    const syncPath = useRef<Array<Array<number>>>([]);
+
+    // const [syncDrawingPath, setSyncDrawingPath] = useState<Array<Array<number>>>([]);
     const [drawingPath, setDrawingPath] = useState<Array<Array<number>>>([]);
 
     const [isDrawing, setIsDrawing] = useState(false);
@@ -86,15 +88,12 @@ export default function DrawingCanvas({selectedTool, connection, room} :
     }
     function handleSync(message : IMessage) {
         let syncData : drawData = JSON.parse(message.body);
-        console.log(syncData);
 
         if (syncCanvasCtxRef.current && otherSyncCanvasCtxRef.current) {
             let tool : tool = syncData.tool;
             let point : point = syncData.point;
-            console.log(typeof syncData.status);
             let status : string = syncData.status.toString();
-            console.log(typeof status);
-            console.log(typeof PenStatus.LIFTED);
+
             let test = 0;
             
             //je vais essayer de coder ca pour le pen only pour linstant
@@ -102,22 +101,15 @@ export default function DrawingCanvas({selectedTool, connection, room} :
                 // console.log("ok we are drawing and setting up shit")
                 setupCanvas(syncCanvasCtxRef.current, tool);
                 setupCanvas(otherSyncCanvasCtxRef.current, tool);
-                console.log("X: " + point.x);
-                console.log("Y: " + point.y);
                 addPositionToPathSync([point.x, point.y]);
                 if (syncCanvasRef.current && syncCanvasCtxRef.current){
-                    // console.log("inside of if we should be drawing");
                     syncCanvasCtxRef.current.clearRect(0, 0, syncCanvasRef.current.width, syncCanvasRef.current.height);
                     syncCanvasCtxRef.current.beginPath();
-                    //ya jamais de point qui sont dessiner XD?
-                    // console.log(syncDrawingPath);
-                    for (const drawPoint of syncDrawingPath) {
-                        // console.log(drawPoint);
+                    for (const drawPoint of syncPath.current) {
                         syncCanvasCtxRef.current.lineTo(drawPoint[0], drawPoint[1]);
                         syncCanvasCtxRef.current.moveTo(drawPoint[0], drawPoint[1]);
                     }
                     syncCanvasCtxRef.current.stroke();
-                    // console.log("after stroke");
                     otherSyncCanvasCtxRef.current.clearRect(0, 0, otherSyncCanvasRef.current!.width, otherSyncCanvasRef.current!.height);
                     otherSyncCanvasCtxRef.current.drawImage(syncCanvasRef.current, 0,0);
 
@@ -142,15 +134,17 @@ export default function DrawingCanvas({selectedTool, connection, room} :
     //duplicaiton code xdd mais bon je vias penser plus tard 
     //for sync
     function addPositionToPathSync(position : Array<number>) {
-        let syncNewPath = structuredClone(syncDrawingPath);
+        let syncNewPath = structuredClone(syncPath.current);
         syncNewPath.push(position);
         // console.log(newPath);
-        setSyncDrawingPath(syncNewPath);
+        // setSyncDrawingPath(syncNewPath);
+        syncPath.current = syncNewPath;
     }
 
     function resetPathSync() {
         console.log("THIS IS CALLED WHEN IT SHOULDNT BE");
-        setSyncDrawingPath([]);
+        // setSyncDrawingPath([]);
+        syncPath.current = [];
     }
     //for sync
 
