@@ -22,7 +22,7 @@ public class DrawingDataController {
 
     @MessageMapping("/coordinates/{roomId}")
     public void relayCoordinates(@DestinationVariable String roomId, DrawingData data, StompHeaderAccessor headers) throws Exception {
-        System.out.println(data.toString());
+//        System.out.println(data.toString());
         send(data, headers);
 
     }

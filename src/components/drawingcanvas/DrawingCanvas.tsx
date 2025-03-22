@@ -29,6 +29,7 @@ export default function DrawingCanvas({selectedTool, connection, room} :
     const [drawingPath, setDrawingPath] = useState<Array<Array<number>>>([]);
 
     const [isDrawing, setIsDrawing] = useState(false);
+    const [isSendingData, setIsSendingData] = useState(false);
     useEffect(() => {
         console.log("USE EFFECT IN DRAWING CANVAS IS CALLED");
         //les height et width ne changent jamais? si on change de taille le viewport 
@@ -51,9 +52,11 @@ export default function DrawingCanvas({selectedTool, connection, room} :
         
     }, []);
     
+    //bug where it doesnt connect when refreshing page
     useEffect(() => {
     
         if (connection?.connected) {
+            console.log("we are subbing to even");
             connection.subscribe(`/user/queue/${room}`, message => {
                 handleSync(message);
             })
@@ -89,36 +92,48 @@ export default function DrawingCanvas({selectedTool, connection, room} :
     function handleSync(message : IMessage) {
         let syncData : drawData = JSON.parse(message.body);
 
-        if (syncCanvasCtxRef.current && otherSyncCanvasCtxRef.current) {
+        if (syncCanvasCtxRef.current && otherSyncCanvasCtxRef.current && syncCanvasRef.current && otherSyncCanvasRef.current) {
             let tool : tool = syncData.tool;
+            console.log(tool);
             let point : point = syncData.point;
             let status : string = syncData.status.toString();
-
-            let test = 0;
+            setupCanvas(syncCanvasCtxRef.current, tool);
+            setupCanvas(otherSyncCanvasCtxRef.current, tool);
             
-            //je vais essayer de coder ca pour le pen only pour linstant
-            if (status !== "LIFTED") {
-                // console.log("ok we are drawing and setting up shit")
-                setupCanvas(syncCanvasCtxRef.current, tool);
-                setupCanvas(otherSyncCanvasCtxRef.current, tool);
+            //je vais essayer de coder ca pour le pen only pour linstant also repetition de code trop paresseux de changer ca...
+            if (status !== "LIFTED" && tool.tool === "pen") {
                 addPositionToPathSync([point.x, point.y]);
-                if (syncCanvasRef.current && syncCanvasCtxRef.current){
-                    syncCanvasCtxRef.current.clearRect(0, 0, syncCanvasRef.current.width, syncCanvasRef.current.height);
-                    syncCanvasCtxRef.current.beginPath();
-                    for (const drawPoint of syncPath.current) {
-                        syncCanvasCtxRef.current.lineTo(drawPoint[0], drawPoint[1]);
-                        syncCanvasCtxRef.current.moveTo(drawPoint[0], drawPoint[1]);
-                    }
-                    syncCanvasCtxRef.current.stroke();
-                    otherSyncCanvasCtxRef.current.clearRect(0, 0, otherSyncCanvasRef.current!.width, otherSyncCanvasRef.current!.height);
-                    otherSyncCanvasCtxRef.current.drawImage(syncCanvasRef.current, 0,0);
+                refresh(syncCanvasRef.current!, syncCanvasCtxRef.current, syncPath.current);
+                //copies to the other one at the same time
+                otherSyncCanvasCtxRef.current.clearRect(0, 0, otherSyncCanvasRef.current.width, otherSyncCanvasRef.current.height);
+                otherSyncCanvasCtxRef.current.drawImage(syncCanvasRef.current, 0,0);
 
-                }
             }
+            else if (status !== "LIFTED" && tool.tool === "eraser") {
+                //copy sync to other sync
+                console.log("inside of eraser");
+                otherSyncCanvasCtxRef.current.drawImage(syncCanvasRef.current, 0, 0);
+                displayCtxRef.current!.globalCompositeOperation = otherSyncCanvasCtxRef.current.globalCompositeOperation;
+                //stroke in other sync
+                otherSyncCanvasCtxRef.current.lineTo(point.x, point.y);
+                otherSyncCanvasCtxRef.current.moveTo(point.x, point.y);
+                otherSyncCanvasCtxRef.current.stroke();
+                displayCtxRef.current?.lineTo(point.x, point.y);
+                displayCtxRef.current?.moveTo(point.x, point.y);
+                displayCtxRef.current?.stroke();
+                //clear sync and copy back to sync
+                syncCanvasCtxRef.current.clearRect(0, 0, syncCanvasRef.current.width, syncCanvasRef.current.height);
+                syncCanvasCtxRef.current.drawImage(otherSyncCanvasRef.current, 0, 0);
+            }
+
             else{
-                console.log("IS IT IN HERE FOR NO REASON?");
+                //when lifted, put everything on the display
                 resetPathSync();
-                // displayCtxRef.current!.drawImage(syncCanvasRef.current!, 0,0);
+                displayCtxRef.current!.globalCompositeOperation = otherSyncCanvasCtxRef.current.globalCompositeOperation;
+                displayCtxRef.current!.drawImage(syncCanvasRef.current, 0,0);
+                syncCanvasCtxRef.current.clearRect(0, 0, syncCanvasRef.current.width, syncCanvasRef.current.height);
+                otherSyncCanvasCtxRef.current.clearRect(0, 0, otherSyncCanvasRef.current.width, otherSyncCanvasRef.current.height);
+
             }
         }
     }
@@ -136,14 +151,10 @@ export default function DrawingCanvas({selectedTool, connection, room} :
     function addPositionToPathSync(position : Array<number>) {
         let syncNewPath = structuredClone(syncPath.current);
         syncNewPath.push(position);
-        // console.log(newPath);
-        // setSyncDrawingPath(syncNewPath);
         syncPath.current = syncNewPath;
     }
 
     function resetPathSync() {
-        console.log("THIS IS CALLED WHEN IT SHOULDNT BE");
-        // setSyncDrawingPath([]);
         syncPath.current = [];
     }
     //for sync
@@ -182,7 +193,6 @@ export default function DrawingCanvas({selectedTool, connection, room} :
                 break;
             }
 
-            //same problem with eraser when opacity XDDDDD bro do i even want opacity for this then
             case "eraser" : {
                 if (displayCtxRef.current && displayCanvasRef.current) {
                     setupCanvas(displayCtxRef.current, selectedTool)
@@ -210,25 +220,21 @@ export default function DrawingCanvas({selectedTool, connection, room} :
         }
         else {
             addPositionToPath([xPos, yPos]);
-            refresh();
+            refresh(drawingCanvasRef.current!, drawingCtxRef.current!, drawingPath);
         }
     
     }
 
     //should have parameters here parce uqe je voudrais refresh pour different truc
-    function refresh() {
-
-        if (drawingCanvasRef.current && drawingCtxRef.current){
+    function refresh(canvas : HTMLCanvasElement, context : CanvasRenderingContext2D, path : Array<Array<number>>) {
             
-            drawingCtxRef.current.clearRect(0, 0, drawingCanvasRef.current.width, drawingCanvasRef.current.height);
-            drawingCtxRef.current.beginPath();
-            for (const drawPoint of drawingPath) {
-                drawingCtxRef.current.lineTo(drawPoint[0], drawPoint[1]);
-                drawingCtxRef.current.moveTo(drawPoint[0], drawPoint[1]);
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.beginPath();
+            for (const drawPoint of path) {
+                context.lineTo(drawPoint[0], drawPoint[1]);
+                context.moveTo(drawPoint[0], drawPoint[1]);
             }
-            drawingCtxRef.current.stroke();
-
-        }
+            context.stroke();
     }
 
 
