@@ -5,8 +5,8 @@ import Chat from './components/chat/Chat'
 import ToolBar from './components/toolbar/ToolBar'
 import {Client} from '@stomp/stompjs'
 import SessionInterface from './components/sessionconnect/SessionInterface'
-import { tool } from './interface'
 import connectToWebSocket from './websocket'
+import inventory from './inventory'
 
 function App() {
 
@@ -14,26 +14,6 @@ const [isConnected, setIsConnected] = useState(false);
 const [connection, setConnection] = useState<Client | null>(null);
 const [roomIdentifier, setRoomIdenfitier] = useState<string | null>(null);
 const [testConnect, setTestConnect] = useState(false);
-
-//ce truc pourrait meme etre dans un autre fichier je pense
-const defaultPen  : tool= {
-  tool : "pen",
-  width : 10,
-  opacity : 100,
-  colour : [209, 202, 219]
-}
-
-const defaultEraser : tool = {
-  tool : "eraser",
-  width : 10,
-  opacity : 100,
-
-}
-const inventory = {
-  pen : defaultPen,
-  eraser : defaultEraser
-}
-
 const [toolInventory, setToolInventory] = useState(inventory);
 const [popupVisibility, setPopupVisibility] = useState(false);
 const [itemSelected, setItemSelected] = useState("pen"); 

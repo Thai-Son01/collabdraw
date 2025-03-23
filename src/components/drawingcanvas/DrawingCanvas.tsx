@@ -56,6 +56,7 @@ export default function DrawingCanvas({selectedTool, connection, room, connected
     //bug where it doesnt connect when refreshing page
     useEffect(() => {
         if (connection?.connected) {
+            console.log("SUBBING TO EVENT");
             connection.subscribe(`/user/queue/${room}`, message => {
                 handleSync(message);
             })
@@ -64,8 +65,8 @@ export default function DrawingCanvas({selectedTool, connection, room, connected
     }, [connected]);
 
     function setContext(canvas: HTMLCanvasElement, contextRef: React.RefObject<CanvasRenderingContext2D | null>, tool: tool) {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        canvas.width = 3840;
+        canvas.height = 2160;
         const ctx = canvas.getContext("2d");
         if (ctx) {
             setupCanvas(ctx, tool);
@@ -93,9 +94,10 @@ export default function DrawingCanvas({selectedTool, connection, room, connected
 
         if (syncCanvasCtxRef.current && otherSyncCanvasCtxRef.current && syncCanvasRef.current && otherSyncCanvasRef.current) {
             let tool : tool = syncData.tool;
-            console.log(tool);
+            // console.log(tool);
             let point : point = syncData.point;
             let status : string = syncData.status.toString();
+            console.log(status);
             setupCanvas(syncCanvasCtxRef.current, tool);
             setupCanvas(otherSyncCanvasCtxRef.current, tool);
             
@@ -104,14 +106,16 @@ export default function DrawingCanvas({selectedTool, connection, room, connected
                 addPositionToPathSync([point.x, point.y]);
                 refresh(syncCanvasRef.current!, syncCanvasCtxRef.current, syncPath.current);
                 //copies to the other one at the same time
+                //jai oublier pouruqoi javais fait ca je pense cest parce que je voulais que les gens puissent effacer ce que les autres font
                 otherSyncCanvasCtxRef.current.clearRect(0, 0, otherSyncCanvasRef.current.width, otherSyncCanvasRef.current.height);
                 otherSyncCanvasCtxRef.current.drawImage(syncCanvasRef.current, 0,0);
 
             }
-            //buncha repetition again
+            //buncha repetition again 
+            //THIS IS REALLY SLOW THERE IS A CLEAR DELAY
             else if (status !== "LIFTED" && tool.tool === "eraser") {
                 //copy sync to other sync
-                console.log("inside of eraser");
+                // console.log("inside of eraser");
                 otherSyncCanvasCtxRef.current.drawImage(syncCanvasRef.current, 0, 0);
                 displayCtxRef.current!.globalCompositeOperation = otherSyncCanvasCtxRef.current.globalCompositeOperation;
                 //stroke in other sync
@@ -244,7 +248,7 @@ export default function DrawingCanvas({selectedTool, connection, room, connected
         {/* SYNCING WITH BACKEND WHEN IN ROOM CANVAS */}
         <canvas
             ref={otherSyncCanvasRef}
-            className={`${styles.bottomCanvas}`}>
+            className={`${styles.otherSync}`}>
         </canvas>
 
         {/* SYNCING WITH BACKEND WHEN IN ROOM CANVAS */}
