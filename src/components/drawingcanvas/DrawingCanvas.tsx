@@ -3,12 +3,13 @@ import styles from './DrawingCanvas.module.css'
 import React, { useState, useEffect, useRef } from "react";
 import { drawData, PenStatus, point, tool } from '../../interface';
 
-export default function DrawingCanvas({selectedTool, connection, room, connected} : 
+export default function DrawingCanvas({selectedTool, connection, room, connected, needSync} : 
                                     {
                                     selectedTool : tool,
                                     connection : Client | null,
                                     room : string | null,
-                                    connected : boolean |undefined
+                                    connected : boolean,
+                                    needSync : boolean
                                     }){
 
     
@@ -32,7 +33,6 @@ export default function DrawingCanvas({selectedTool, connection, room, connected
     const [isDrawing, setIsDrawing] = useState(false);
     const [isSendingData, setIsSendingData] = useState(false);
     useEffect(() => {
-        console.log("USE EFFECT IN DRAWING CANVAS IS CALLED");
         //les height et width ne changent jamais? si on change de taille le viewport 
         if(drawingCanvasRef.current) {
 
@@ -60,6 +60,28 @@ export default function DrawingCanvas({selectedTool, connection, room, connected
             connection.subscribe(`/user/queue/${room}`, message => {
                 handleSync(message);
             })
+            connection.subscribe(`/user/queue/canvas_sync_request/${room}`, message => {
+                //send canvas data if asked from another user
+                console.log("REQUESTING SYNC GET");
+                console.log(message.body);
+                displayCanvasRef.current?.toBlob((blob) => {
+                    //need to send now to requester
+                    // connection.publish({destination : `/app/send_canvas/${room}`, body:);
+
+
+                })
+            })
+            if (needSync) {
+                //send this if user joins room and needs syncing
+                connection.publish({destination : `/app/get_canvas/${room}`, body: JSON.stringify("placeholder")});
+
+                connection.subscribe(`/user/queue/receive_canvas/${room}`, message => {
+                    console.log("SYNC RESPONSE GET");
+                    console.log(message.body);
+                    //draw on to canvas here from blob or something
+                    
+                })
+            }
         }
         
     }, [connected]);
@@ -97,27 +119,35 @@ export default function DrawingCanvas({selectedTool, connection, room, connected
             // console.log(tool);
             let point : point = syncData.point;
             let status : string = syncData.status.toString();
-            console.log(status);
             setupCanvas(syncCanvasCtxRef.current, tool);
             setupCanvas(otherSyncCanvasCtxRef.current, tool);
             
-            //je vais essayer de coder ca pour le pen only pour linstant also repetition de code trop paresseux de changer ca...
+            //beaucoup de repetition XDDD
             if (status !== "LIFTED" && tool.tool === "pen") {
                 addPositionToPathSync([point.x, point.y]);
                 refresh(syncCanvasRef.current!, syncCanvasCtxRef.current, syncPath.current);
                 //copies to the other one at the same time
-                //jai oublier pouruqoi javais fait ca je pense cest parce que je voulais que les gens puissent effacer ce que les autres font
                 otherSyncCanvasCtxRef.current.clearRect(0, 0, otherSyncCanvasRef.current.width, otherSyncCanvasRef.current.height);
                 otherSyncCanvasCtxRef.current.drawImage(syncCanvasRef.current, 0,0);
+                // syncCanvasRef.current.toBlob((blob) => {
+                //     //send blob to server
+                //     // console.log(blob);
+                // });
+                // console.log(syncCanvasCtxRef.current);
 
             }
             //buncha repetition again 
             //THIS IS REALLY SLOW THERE IS A CLEAR DELAY
+            //maybe was overthinkg this. jai meme pas de maniere de tester teehee xdddd
+            //lagging as shit boy
             else if (status !== "LIFTED" && tool.tool === "eraser") {
                 //copy sync to other sync
                 // console.log("inside of eraser");
                 otherSyncCanvasCtxRef.current.drawImage(syncCanvasRef.current, 0, 0);
-                displayCtxRef.current!.globalCompositeOperation = otherSyncCanvasCtxRef.current.globalCompositeOperation;
+
+                if (displayCtxRef.current!.globalCompositeOperation !== otherSyncCanvasCtxRef.current.globalCompositeOperation) {
+                    displayCtxRef.current!.globalCompositeOperation = otherSyncCanvasCtxRef.current.globalCompositeOperation;
+                }
                 //stroke in other sync
                 otherSyncCanvasCtxRef.current.lineTo(point.x, point.y);
                 otherSyncCanvasCtxRef.current.moveTo(point.x, point.y);

@@ -16,16 +16,18 @@ const [roomIdentifier, setRoomIdenfitier] = useState<string | null>(null);
 const [testConnect, setTestConnect] = useState(false);
 const [toolInventory, setToolInventory] = useState(inventory);
 const [popupVisibility, setPopupVisibility] = useState(false);
+const [syncCanvas, setSyncCanvas] = useState(false);
 const [itemSelected, setItemSelected] = useState("pen"); 
 
 useEffect(() => {
-
+  console.log("USE EFFECT CALLED IN APP");
   const currentUrl = new URL(window.location.href);
   const room = currentUrl.searchParams.get("room");
 
   if (room && !isConnected && !connection) {
     let websocketClient = connectToWebSocket("test_user_id", room, socketIsConnected);
     connect(websocketClient, room);
+    setSyncCanvas(true);
   }
 
   return () => {
@@ -92,6 +94,7 @@ function setModal(visibility : boolean) {
       selectedTool= {toolInventory[itemSelected]} //underlined red mais ca a l'air de marcher
       room = {roomIdentifier !== null? roomIdentifier : null}
       connected = {testConnect}
+      needSync = {syncCanvas}
       ></DrawingCanvas>
       
       <Chat></Chat>
