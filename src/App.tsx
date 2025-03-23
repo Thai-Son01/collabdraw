@@ -13,6 +13,7 @@ function App() {
 const [isConnected, setIsConnected] = useState(false);
 const [connection, setConnection] = useState<Client | null>(null);
 const [roomIdentifier, setRoomIdenfitier] = useState<string | null>(null);
+const [testConnect, setTestConnect] = useState(false);
 
 //ce truc pourrait meme etre dans un autre fichier je pense
 const defaultPen  : tool= {
@@ -35,41 +36,42 @@ const inventory = {
 
 const [toolInventory, setToolInventory] = useState(inventory);
 const [popupVisibility, setPopupVisibility] = useState(false);
-const [itemSelected, setItemSelected] = useState("pen"); //id of selected tool
-//no idea if useridentifier necessary parce que cest le backend qui cree un id
-
+const [itemSelected, setItemSelected] = useState("pen"); 
 
 useEffect(() => {
+
   const currentUrl = new URL(window.location.href);
   const room = currentUrl.searchParams.get("room");
-  if (room && !isConnected) {
-    console.log(room);
-    let websocketClient = connectToWebSocket("test_user_id", room); //where do i put the url man
+
+  if (room && !isConnected && !connection) {
+    let websocketClient = connectToWebSocket("test_user_id", room, socketIsConnected);
     connect(websocketClient, room);
   }
 
   return () => {
     disconnect();
   };
+
 }, [])
 
+
+function socketIsConnected() {
+  setTestConnect(true);
+}
+
 function connect(client : Client, roomId : string) {
-  console.log("connect is called");
   setConnection(client);
   setRoomIdenfitier(roomId);
   setIsConnected(true);
-  console.log("after connect");
 }
 
 function disconnect() {
 
   if (connection) {
-    console.log("disconnecting");
     connection.deactivate();
     setIsConnected(false);
     setRoomIdenfitier(null);
     setConnection(null);
-    console.log("disconnected");
   }
 }
 
@@ -109,6 +111,7 @@ function setModal(visibility : boolean) {
       connection = {connection !== null ? connection : null}
       selectedTool= {toolInventory[itemSelected]} //underlined red mais ca a l'air de marcher
       room = {roomIdentifier !== null? roomIdentifier : null}
+      connected = {testConnect}
       ></DrawingCanvas>
       
       <Chat></Chat>
@@ -120,6 +123,7 @@ function setModal(visibility : boolean) {
       disconnectFromSession = {disconnect}
       isConnected = {isConnected}
       room = {roomIdentifier !== null? roomIdentifier : null}
+      websocketOnConnect = {socketIsConnected}
       >
       </SessionInterface>
 

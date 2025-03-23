@@ -3,7 +3,7 @@ import { Client } from "@stomp/stompjs";
 
 const url = "ws://localhost:8080/gs-guide-websocket";
 
-export default function connectToWebSocket(userId : string, room : string, serverUrl : string = url) {
+export default function connectToWebSocket(userId : string, room : string,  onConnection : () => void, serverUrl : string = url) {
     const headers = {
                     "user-id" : userId,
                     "room" : room
@@ -27,6 +27,8 @@ export default function connectToWebSocket(userId : string, room : string, serve
                     body: JSON.stringify({'name': userId})
                         });
             console.log("connected to server through websocket");
+            console.log(client.connected);
+            onConnection();
 
             }
 

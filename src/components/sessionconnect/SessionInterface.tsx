@@ -3,13 +3,14 @@ import styles from './SessionInterface.module.css'
 import {Client} from '@stomp/stompjs'
 import connectToWebSocket from '../../websocket';
 
-export default function SessionInterface({visibility, changeVisibility, connectToSession, isConnected, room, disconnectFromSession} : 
+export default function SessionInterface({visibility, changeVisibility, connectToSession, isConnected, room, disconnectFromSession, websocketOnConnect} : 
                                         {visibility : boolean,
                                         changeVisibility : (value : boolean) => void,
                                         connectToSession : (client : Client ,roomId: string) => void,
                                         isConnected : boolean,
                                         room: string | null,
                                         disconnectFromSession : () => void,
+                                        websocketOnConnect : () => void,
                                         }) {
 
     const dialog = useRef<HTMLDialogElement>(null);
@@ -50,7 +51,7 @@ export default function SessionInterface({visibility, changeVisibility, connectT
 
                 input.current.value = url.toString();
                 history.pushState({}, "", url);
-                let websocketClient = connectToWebSocket("test_user_id", roomId);
+                let websocketClient = connectToWebSocket("test_user_id", roomId, websocketOnConnect);
                 
                 connectToSession(websocketClient, roomId);
             }

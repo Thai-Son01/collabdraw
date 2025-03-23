@@ -3,11 +3,12 @@ import styles from './DrawingCanvas.module.css'
 import React, { useState, useEffect, useRef } from "react";
 import { drawData, PenStatus, point, tool } from '../../interface';
 
-export default function DrawingCanvas({selectedTool, connection, room} : 
+export default function DrawingCanvas({selectedTool, connection, room, connected} : 
                                     {
                                     selectedTool : tool,
                                     connection : Client | null,
                                     room : string | null,
+                                    connected : boolean |undefined
                                     }){
 
     
@@ -54,15 +55,13 @@ export default function DrawingCanvas({selectedTool, connection, room} :
     
     //bug where it doesnt connect when refreshing page
     useEffect(() => {
-    
         if (connection?.connected) {
-            console.log("we are subbing to even");
             connection.subscribe(`/user/queue/${room}`, message => {
                 handleSync(message);
             })
         }
         
-    }, [connection?.connected]);
+    }, [connected]);
 
     function setContext(canvas: HTMLCanvasElement, contextRef: React.RefObject<CanvasRenderingContext2D | null>, tool: tool) {
         canvas.width = window.innerWidth;
@@ -109,6 +108,7 @@ export default function DrawingCanvas({selectedTool, connection, room} :
                 otherSyncCanvasCtxRef.current.drawImage(syncCanvasRef.current, 0,0);
 
             }
+            //buncha repetition again
             else if (status !== "LIFTED" && tool.tool === "eraser") {
                 //copy sync to other sync
                 console.log("inside of eraser");
@@ -265,6 +265,7 @@ export default function DrawingCanvas({selectedTool, connection, room} :
             onMouseDown={(e : React.MouseEvent)=> {
                 if (!isDrawing && drawingCanvasRef.current && e.button === 0) {
                     
+                    setIsSendingData(true);
                     setIsDrawing(true);
                     setupTool(e);
 
@@ -278,7 +279,9 @@ export default function DrawingCanvas({selectedTool, connection, room} :
                     let point : point = {x : currentX, y : currentY};
                     let drawData : drawData = {tool : selectedTool, point : point, status : PenStatus.MOVING};
                     draw(currentX, currentY, selectedTool.tool);
-                    sendData(drawData);
+                    if (isSendingData) {
+                        sendData(drawData);
+                    }
                 }
 
 
@@ -293,7 +296,10 @@ export default function DrawingCanvas({selectedTool, connection, room} :
                     resetPath();
                     let point : point = {x : 0, y : 0};
                     let drawData : drawData = {tool : selectedTool, point : point, status : PenStatus.LIFTED};
-                    sendData(drawData);
+                    if (isSendingData) {
+                        sendData(drawData);
+                    }
+                    setIsSendingData(false);
                 }
             }}
 
