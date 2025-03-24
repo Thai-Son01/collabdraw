@@ -2,6 +2,8 @@ import { Client, IMessage } from '@stomp/stompjs';
 import styles from './DrawingCanvas.module.css'
 import React, { useState, useEffect, useRef } from "react";
 import { drawData, PenStatus, point, tool } from '../../interface';
+import * as fflate from 'fflate';
+import { gzipSync,  } from 'fflate';
 
 export default function DrawingCanvas({selectedTool, connection, room, connected, needSync} : 
                                     {
@@ -55,36 +57,86 @@ export default function DrawingCanvas({selectedTool, connection, room, connected
     
     //bug where it doesnt connect when refreshing page
     useEffect(() => {
+        console.log(`Need sync : ${needSync}`);
         if (connection?.connected) {
             console.log("SUBBING TO EVENT");
             connection.subscribe(`/user/queue/${room}`, message => {
                 handleSync(message);
             })
+            //send canvas data if asked from another user
             connection.subscribe(`/user/queue/canvas_sync_request/${room}`, message => {
-                //send canvas data if asked from another user
                 console.log("REQUESTING SYNC GET");
-                console.log(message.body);
+                console.log(message.body); //requester
                 displayCanvasRef.current?.toBlob((blob) => {
+                    console.log("IS INSIDE OF BLOB");
                     //need to send now to requester
-                    // connection.publish({destination : `/app/send_canvas/${room}`, body:);
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        console.log("INSIDE OF ONLOADEND")
+                        let res = reader.result as string;
+                        let base64data = res.split(',')[1]; //remove the header or something
+                        console.log(base64data.length);
 
+                        const u8 = fflate.strToU8(base64data); //convert to u8 (0-255) for each character
+                        const compress = fflate.gzipSync(u8); //compress
+                        const compress64 = uint8ArrayToBase64(compress); //return back to base64
+                        console.log("BEFORE PUBLISHING CANVAS");
+                        const compressedCanvas = {image : compress64, requester : message.body.toString()};
+                        connection.publish({destination : `/app/send_canvas/${room}`, 
+                                            body: JSON.stringify(compressedCanvas)
+                        });
+                    }
+                    reader.readAsDataURL(blob as Blob); //returns base 64
 
                 })
             })
+            connection.subscribe(`/user/queue/receive_canvas/${room}`, message => {
+                console.log("SYNC RESPONSE GET");
+                console.log(message.body); //this is base 64
+                const u8Message = base64ToUint8Array(message.body);
+                const decompressed = fflate.decompressSync(u8Message);
+                const d = fflate.strFromU8(decompressed);
+                console.log(d.length);
+                const imageSource = `data:image/png;base64,${d}`;
+                const image = new Image();
+                image.onload = function() {
+                    displayCtxRef.current?.drawImage(image, 0, 0);
+                }
+                image.src = imageSource;
+
+            })
+
             if (needSync) {
                 //send this if user joins room and needs syncing
                 connection.publish({destination : `/app/get_canvas/${room}`, body: JSON.stringify("placeholder")});
 
-                connection.subscribe(`/user/queue/receive_canvas/${room}`, message => {
-                    console.log("SYNC RESPONSE GET");
-                    console.log(message.body);
-                    //draw on to canvas here from blob or something
-                    
-                })
             }
         }
         
     }, [connected]);
+
+    function base64ToUint8Array(base64 : any) {
+        // Decode base64 to binary string
+        const binaryString = atob(base64);
+        
+        // Create a Uint8Array with the length of the binary string
+        const uint8Array = new Uint8Array(binaryString.length);
+        
+        // Fill the Uint8Array with the byte values of the binary string
+        for (let i = 0; i < binaryString.length; i++) {
+            uint8Array[i] = binaryString.charCodeAt(i);
+        }
+        
+        return uint8Array;
+    }
+
+    function uint8ArrayToBase64(uint8Array : any) {
+        let binaryString = '';
+        for (let i = 0; i < uint8Array.length; i++) {
+            binaryString += String.fromCharCode(uint8Array[i]);
+        }
+        return btoa(binaryString); // Convert the binary string to Base64
+    }
 
     function setContext(canvas: HTMLCanvasElement, contextRef: React.RefObject<CanvasRenderingContext2D | null>, tool: tool) {
         canvas.width = 3840;

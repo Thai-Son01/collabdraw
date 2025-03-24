@@ -6,7 +6,7 @@ import java.util.*;
 
 @Service
 public class RoomManager {
-    private static final Map<String, SortedSet<String>> rooms = new HashMap<>();
+    private static final Map<String, LinkedHashSet<String>> rooms = new HashMap<>();
 
     public void addUserToRoom(String roomId, String username) {
 
@@ -15,7 +15,7 @@ public class RoomManager {
         }
 
         else {
-            SortedSet<String> names = new TreeSet<>();
+            LinkedHashSet<String> names = new LinkedHashSet<>();
             names.add(username);
             rooms.put(roomId, names);
         }
@@ -32,7 +32,7 @@ public class RoomManager {
         }
     }
 
-    public SortedSet<String> getRoomUsers(String roomId) {
+    public Set<String> getRoomUsers(String roomId) {
 
         if (rooms.containsKey(roomId)) {
             return rooms.get(roomId);
@@ -41,7 +41,7 @@ public class RoomManager {
     }
 
     public String getRoomIdFromUser(String user) {
-        for (Map.Entry<String, SortedSet<String>> entry : rooms.entrySet()) {
+        for (Map.Entry<String, LinkedHashSet<String>> entry : rooms.entrySet()) {
             if (entry.getValue().contains(user)) {
                 return entry.getKey();
             }
@@ -51,7 +51,7 @@ public class RoomManager {
 
     public void printRooms() {
 
-        for (Map.Entry<String, SortedSet<String>> entry : rooms.entrySet()) {
+        for (Map.Entry<String, LinkedHashSet<String>> entry : rooms.entrySet()) {
             String key = entry.getKey();
             Set<String> value = entry.getValue();
             System.out.println("ROOM : " + key);
