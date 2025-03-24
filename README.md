@@ -1,5 +1,5 @@
 ## Collaborative drawing web app
-A fullstack project to learn ReactJS and Java Springboot.
+A fullstack project to learn ReactJS in the front-end and Java Springboot in the server side. The user interface is designed with ReactJS components and the different hooks such as useState and useEffect. Users draw on HTML Canvases and can share their canvas to other users to draw together using websockets. 
 
 
 ## Built With
