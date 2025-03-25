@@ -30,4 +30,5 @@ Typescript
 - [ ] Zoomable canvas
 - [ ] Refactor drawing canvas component
 - [ ] Add different colour pens
+- [ ] Chat box
 - [ ] Deploy client and server
